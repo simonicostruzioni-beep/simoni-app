@@ -127,7 +127,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -242,7 +242,6 @@ function render() {
 
 function renderScreen() {
   if (S.screen === 'login') return screenLogin();
-  if (S.loading && !S.workers.length && !S.sites.length) return screenLoadingShell();
   if (S.screen === 'home') return screenHome();
   if (S.screen === 'giornata') return screenGiornata();
   if (S.screen === 'cantieri') return screenCantieri();
@@ -253,15 +252,16 @@ function renderScreen() {
 }
 
 function topbar(title, sub, showBack) {
+  const subText = S.loading ? 'Aggiornamento dati…' : sub;
   return `
   <div class="topbar">
     <div class="row">
       <div>
         ${showBack ? `<button class="back-link" id="back-btn">&larr; Indietro</button>` : ''}
         <h1>${escapeHtml(title)}</h1>
-        ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ''}
+        ${subText ? `<div class="sub">${escapeHtml(subText)}</div>` : ''}
       </div>
-      <button class="icon-btn" id="refresh-btn" title="Aggiorna">&#8635;</button>
+      <button class="icon-btn" id="refresh-btn" title="Aggiorna" ${S.loading ? 'disabled' : ''}>&#8635;</button>
     </div>
   </div>`;
 }
