@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impresa Simoni — Amministrazione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --ink:#1F2421; --steel:#4A5049; --concrete:#E4E0D6; --paper:#FBF9F4;
+    --orange:#E8590C; --orange-dark:#C44A08; --green:#4C7A52; --red:#B23A2E;
+    --border:#CFC9B8; --border-soft:#E2DDCF; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--concrete);color:var(--ink);font-family:'Inter',sans-serif;}
+  h1,h2,h3,.disp{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  #app{max-width:1100px;margin:0 auto;min-height:100vh;background:var(--concrete);padding-bottom:40px;}
+
+  .topbar{background:var(--ink);color:var(--paper);padding:18px 26px;display:flex;justify-content:space-between;align-items:center;}
+  .topbar h1{font-size:19px;margin:0;color:#fff;}
+  .topbar .sub{font-size:12px;color:#C9C4B4;margin-top:2px;font-family:'Inter';text-transform:none;}
+  .icon-btn{background:none;border:1px solid #444943;color:#fff;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:'Inter';}
+
+  .content{padding:26px;}
+  .card{background:var(--paper);border:1px solid var(--border-soft);border-radius:var(--radius);padding:20px;margin-bottom:18px;}
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--steel);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+  input[type=text],input[type=password],input[type=date],select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14.5px;font-family:'Inter';background:#fff;color:var(--ink);}
+  input:focus,select:focus{outline:2px solid var(--orange);outline-offset:1px;border-color:var(--orange);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:8px;padding:11px 18px;font-family:'Oswald';font-weight:600;font-size:13.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;}
+  .btn-primary{background:var(--orange);color:#fff;}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--border);}
+  .btn-danger{background:#fff;color:var(--red);border:1.5px solid var(--red);}
+  .btn-sm{padding:7px 12px;font-size:12px;}
+  .err{background:#FBEAE7;border:1px solid var(--red);color:var(--red);padding:10px 12px;border-radius:8px;font-size:13.5px;margin-bottom:14px;}
+
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-card{background:var(--paper);border-radius:14px;padding:32px 26px;width:100%;max-width:380px;border:1px solid var(--border-soft);box-shadow:0 12px 30px rgba(31,36,33,.12);}
+  .login-badge{width:56px;height:56px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#fff;font-family:'Oswald';font-weight:700;font-size:22px;}
+  .login-card h1{text-align:center;font-size:20px;margin:0 0 4px;}
+  .login-sub{text-align:center;color:var(--steel);font-size:13px;margin-bottom:20px;}
+  .field{margin-bottom:14px;}
+
+  .tabs{display:flex;gap:6px;padding:16px 26px 0;border-bottom:1px solid var(--border-soft);background:var(--concrete);}
+  .tab-btn{background:none;border:none;padding:10px 16px;font-family:'Oswald';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--steel);cursor:pointer;border-bottom:3px solid transparent;}
+  .tab-btn.active{color:var(--orange-dark);border-bottom-color:var(--orange);}
+
+  .row-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid var(--border-soft);border-radius:8px;margin-bottom:8px;}
+  .row-item .name{font-weight:600;font-size:14.5px;}
+  .add-row{display:flex;gap:8px;margin-top:14px;}
+  .add-row input{flex:1;}
+
+  .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .filters > div{flex:1;min-width:150px;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;font-size:13px;}
+  th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--border-soft);}
+  th{background:var(--ink);color:#fff;font-family:'Oswald';font-weight:500;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;}
+  tbody tr:hover{background:#FFF8F0;}
+  .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border-soft);}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--steel);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ================= CONFIGURAZIONE ================= */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'simoni2026';
+const SESSION_KEY = 'is_admin_session_v1';
+
+let S = { screen: 'login', tab: 'operai', loading: false, error: '',
+  workers: [], sites: [], entries: [], notes: [], media: [],
+  filters: { cantiere: '', operaio: '', from: '', to: '' } };
+
+async function apiCall(action, data) {
+  const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, data }) });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+async function refreshData() {
+  S.loading = true; render();
+  try {
+    const data = await apiCall('getAll');
+    S.workers = data.workers || []; S.sites = data.sites || [];
+    S.entries = data.entries || []; S.notes = data.notes || []; S.media = data.media || [];
+  } catch (err) { S.error = 'Errore nel caricamento: ' + err.message; }
+  S.loading = false; render();
+}
+async function saveWorkersRemote() { await apiCall('saveWorkers', S.workers); }
+async function saveSitesRemote() { await apiCall('saveSites', S.sites); }
+async function saveEntriesRemote() { await apiCall('saveEntries', S.entries); }
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+function hasSession(){ return localStorage.getItem(SESSION_KEY)==='1'; }
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+function render(){ document.getElementById('app').innerHTML = renderScreen(); bindEvents(); }
+
+function renderScreen(){
+  if (S.screen==='login') return screenLogin();
+  return screenAdmin();
+}
+
+function screenLogin(){
+  return `
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-badge">IS</div>
+      <h1>Amministrazione</h1>
+      <div class="login-sub">Impresa Simoni — pannello gestione</div>
+      ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+      <form id="login-form">
+        <div class="field"><label>Utente</label><input type="text" id="l-user" autocomplete="username" required></div>
+        <div class="field"><label>Password</label><input type="password" id="l-pass" autocomplete="current-password" required></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Entra</button>
+      </form>
+    </div>
+  </div>`;
+}
+
+function screenAdmin(){
+  return `
+  <div class="topbar">
+    <div><h1>Impresa Simoni</h1><div class="sub">Pannello amministrazione</div></div>
+    <div style="display:flex;gap:8px;">
+      <button class="icon-btn" id="refresh-btn">Aggiorna &#8635;</button>
+      <button class="icon-btn" id="logout-btn">Esci</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn ${S.tab==='operai'?'active':''}" data-tab="operai">Operai</button>
+    <button class="tab-btn ${S.tab==='cantieri'?'active':''}" data-tab="cantieri">Cantieri</button>
+    <button class="tab-btn ${S.tab==='giornate'?'active':''}" data-tab="giornate">Giornate</button>
+  </div>
+  <div class="content">
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    ${S.tab==='operai' ? tabOperai() : ''}
+    ${S.tab==='cantieri' ? tabCantieri() : ''}
+    ${S.tab==='giornate' ? tabGiornate() : ''}
+  </div>`;
+}
+
+function tabOperai(){
+  const rows = S.workers.map((w,i) => `
+    <div class="row-item">
+      <div class="name">${escapeHtml(w)}</div>
+      <button class="btn btn-danger btn-sm w-del" data-idx="${i}">Elimina</button>
+    </div>`).join('');
+  return `
+  <div class="card">
+    <h3 style="margin-top:0;">Operai</h3>
+    ${S.workers.length ? rows : `<div class="empty-state">Nessun operaio ancora inserito.</div>`}
+    <div class="add-row">
+      <input type="text" id="new-worker" placeholder="Nome nuovo operaio">
+      <button class="btn btn-primary" id="add-worker-btn">Aggiungi</button>
+    </div>
+  </div>`;
+}
+
+function tabCantieri(){
+  const rows = S.sites.map((s,i) => `
+    <div class="row-item">
+      <div class="name">${escapeHtml(s)}</div>
+      <button class="btn btn-danger btn-sm s-del" data-idx="${i}">Elimina</button>
+    </div>`).join('');
+  return `
+  <div class="card">
+    <h3 style="margin-top:0;">Cantieri</h3>
+    ${S.sites.length ? rows : `<div class="empty-state">Nessun cantiere ancora inserito.</div>`}
+    <div class="add-row">
+      <input type="text" id="new-site" placeholder="Nome nuovo cantiere">
+      <button class="btn btn-primary" id="add-site-btn">Aggiungi</button>
+    </div>
+  </div>`;
+}
+
+function tabGiornate(){
+  const f = S.filters;
+  let rows = S.entries.slice();
+  if (f.cantiere) rows = rows.filter(e => e.cantiere === f.cantiere);
+  if (f.operaio) rows = rows.filter(e => (e.operai||[]).some(o => o.nome === f.operaio));
+  if (f.from) rows = rows.filter(e => e.date >= f.from);
+  if (f.to) rows = rows.filter(e => e.date <= f.to);
+  rows.sort((a,b) => b.date.localeCompare(a.date));
+
+  const flat = [];
+  rows.forEach(e => (e.operai||[]).forEach(o => flat.push({date:e.date, cantiere:e.cantiere, operaio:o.nome, ore:o.ore, lavorazioni:e.lavorazioni, materiali:e.materiali})));
+
+  const trs = flat.map(r => `
+    <tr>
+      <td class="mono">${fmtDate(r.date)}</td>
+      <td>${escapeHtml(r.cantiere)}</td>
+      <td>${escapeHtml(r.operaio)}</td>
+      <td class="mono">${r.ore}</td>
+      <td>${escapeHtml(r.lavorazioni)}</td>
+      <td>${escapeHtml(r.materiali)}</td>
+    </tr>`).join('');
+
+  return `
+  <div class="card">
+    <div class="filters">
+      <div><label>Cantiere</label><select id="gf-cantiere"><option value="">Tutti</option>${S.sites.map(s=>`<option value="${escapeHtml(s)}" ${f.cantiere===s?'selected':''}>${escapeHtml(s)}</option>`).join('')}</select></div>
+      <div><label>Operaio</label><select id="gf-operaio"><option value="">Tutti</option>${S.workers.map(w=>`<option value="${escapeHtml(w)}" ${f.operaio===w?'selected':''}>${escapeHtml(w)}</option>`).join('')}</select></div>
+      <div><label>Da</label><input type="date" id="gf-from" value="${f.from}"></div>
+      <div><label>A</label><input type="date" id="gf-to" value="${f.to}"></div>
+    </div>
+    <div class="toolbar">
+      <div class="mono" style="font-size:13px;">${flat.length} righe</div>
+      <button class="btn btn-ghost btn-sm" id="export-btn">Esporta Excel</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Data</th><th>Cantiere</th><th>Operaio</th><th>Ore</th><th>Lavorazioni</th><th>Materiali</th></tr></thead>
+        <tbody>${trs || `<tr><td colspan="6" style="text-align:center;color:var(--steel);padding:24px;">Nessun dato</td></tr>`}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function exportXlsx(flat){
+  const data = flat.map(r => ({ Data: fmtDate(r.date), Cantiere: r.cantiere, Operaio: r.operaio, Ore: r.ore, Lavorazioni: r.lavorazioni, Materiali: r.materiali }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Giornate');
+  XLSX.writeFile(wb, 'giornate_impresa_simoni.xlsx');
+}
+
+function bindEvents(){
+  if (S.screen==='login'){
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const u = document.getElementById('l-user').value;
+      const p = document.getElementById('l-pass').value;
+      if (u===ADMIN_USER && p===ADMIN_PASS){
+        localStorage.setItem(SESSION_KEY,'1');
+        S.screen='admin'; S.error=''; render(); refreshData();
+      } else { S.error='Credenziali non valide.'; render(); }
+    });
+    return;
+  }
+  document.getElementById('refresh-btn').addEventListener('click', refreshData);
+  document.getElementById('logout-btn').addEventListener('click', () => { clearSession(); S.screen='login'; render(); });
+  document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => { S.tab=b.dataset.tab; render(); }));
+
+  if (S.tab==='operai'){
+    document.querySelectorAll('.w-del').forEach(btn => btn.addEventListener('click', async () => {
+      const idx = Number(btn.dataset.idx);
+      if (!window.confirm('Eliminare questo operaio? Le giornate già salvate resteranno nello storico.')) return;
+      S.workers.splice(idx,1);
+      try { await saveWorkersRemote(); } catch(err){ alert('Errore: '+err.message); }
+      render();
+    }));
+    document.getElementById('add-worker-btn').addEventListener('click', async () => {
+      const name = document.getElementById('new-worker').value.trim();
+      if (!name) return;
+      if (S.workers.includes(name)) { alert('Operaio già presente.'); return; }
+      S.workers.push(name);
+      try { await saveWorkersRemote(); } catch(err){ alert('Errore: '+err.message); }
+      render();
+    });
+  }
+  if (S.tab==='cantieri'){
+    document.querySelectorAll('.s-del').forEach(btn => btn.addEventListener('click', async () => {
+      const idx = Number(btn.dataset.idx);
+      if (!window.confirm('Eliminare questo cantiere? Le giornate/note già salvate resteranno collegate al nome.')) return;
+      S.sites.splice(idx,1);
+      try { await saveSitesRemote(); } catch(err){ alert('Errore: '+err.message); }
+      render();
+    }));
+    document.getElementById('add-site-btn').addEventListener('click', async () => {
+      const name = document.getElementById('new-site').value.trim();
+      if (!name) return;
+      if (S.sites.includes(name)) { alert('Cantiere già presente.'); return; }
+      S.sites.push(name);
+      try { await saveSitesRemote(); } catch(err){ alert('Errore: '+err.message); }
+      render();
+    });
+  }
+  if (S.tab==='giornate'){
+    document.getElementById('gf-cantiere').addEventListener('change', e => { S.filters.cantiere=e.target.value; render(); });
+    document.getElementById('gf-operaio').addEventListener('change', e => { S.filters.operaio=e.target.value; render(); });
+    document.getElementById('gf-from').addEventListener('change', e => { S.filters.from=e.target.value; render(); });
+    document.getElementById('gf-to').addEventListener('change', e => { S.filters.to=e.target.value; render(); });
+    document.getElementById('export-btn').addEventListener('click', () => {
+      const f = S.filters;
+      let rows = S.entries.slice();
+      if (f.cantiere) rows = rows.filter(e => e.cantiere === f.cantiere);
+      if (f.operaio) rows = rows.filter(e => (e.operai||[]).some(o => o.nome === f.operaio));
+      if (f.from) rows = rows.filter(e => e.date >= f.from);
+      if (f.to) rows = rows.filter(e => e.date <= f.to);
+      const flat = [];
+      rows.forEach(e => (e.operai||[]).forEach(o => flat.push({date:e.date, cantiere:e.cantiere, operaio:o.nome, ore:o.ore, lavorazioni:e.lavorazioni, materiali:e.materiali})));
+      exportXlsx(flat);
+    });
+  }
+}
+
+function init(){
+  if (hasSession()){ S.screen='admin'; render(); refreshData(); }
+  else render();
+}
+init();
+</script>
+</body>
+</html>
