@@ -94,6 +94,8 @@
   .note-item .date{font-family:'JetBrains Mono';font-size:11.5px;color:var(--steel);margin-bottom:6px;}
   .note-item .txt{font-size:14.5px;line-height:1.45;white-space:pre-wrap;margin-bottom:10px;}
   .note-item .txt:last-child{margin-bottom:0;}
+  .note-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);}
+  .note-actions .btn{flex:1;}
   .photo-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
   .photo-strip img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--border-soft);}
   .audio-item{width:100%;margin-bottom:6px;}
@@ -422,6 +424,10 @@ function screenCantiereDetail() {
       ${n.testo ? `<div class="txt">${escapeHtml(n.testo)}</div>` : ''}
       ${photos.length ? `<div class="photo-strip">${photos.map(p => `<img src="${p.url}" alt="foto">`).join('')}</div>` : ''}
       ${audios.map(a => `<audio class="audio-item" controls src="${a.url}"></audio>`).join('')}
+      <div class="note-actions">
+        <button class="btn btn-ghost btn-sm note-edit" data-id="${n.id}">Modifica</button>
+        <button class="btn btn-danger btn-sm note-del" data-id="${n.id}">Elimina</button>
+      </div>
     </div>`;
   }).join('');
 
@@ -436,13 +442,24 @@ function screenCantiereDetail() {
 
 function screenNota() {
   if (!NOTE_DRAFT) NOTE_DRAFT = { photos: [] };
+  if (!NOTE_DRAFT.existingMedia) NOTE_DRAFT.existingMedia = [];
+  const isEdit = !!NOTE_DRAFT.id;
+  const existingPhotos = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'foto');
+  const existingAudios = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'audio');
+
   const audioPreview = MEDIA_REC.audioUrl
     ? `<audio class="audio-item" controls src="${MEDIA_REC.audioUrl}"></audio>
        <button class="btn btn-ghost btn-sm" id="discard-audio-btn">Elimina registrazione</button>`
     : '';
   const recControls = MEDIA_REC.recording
     ? `<div class="rec-row"><span class="rec-dot"></span> Registrazione in corso… <button class="btn btn-danger btn-sm" id="stop-rec-btn">Ferma</button></div>`
-    : `<button class="btn btn-ghost btn-block" id="start-rec-btn">&#127908; Registra nota audio</button>`;
+    : `<button class="btn btn-ghost btn-block" id="start-rec-btn">&#127908; Registra nuova nota audio</button>`;
+
+  const existingPhotosHtml = existingPhotos.map(m => `
+    <div class="stage-photo">
+      <img src="${m.url}">
+      <button class="rm" data-existing-id="${m.id}">&times;</button>
+    </div>`).join('');
 
   const photosStage = NOTE_DRAFT.photos.map((p, i) => `
     <div class="stage-photo">
@@ -450,8 +467,14 @@ function screenNota() {
       <button class="rm" data-idx="${i}">&times;</button>
     </div>`).join('');
 
+  const existingAudiosHtml = existingAudios.map(m => `
+    <div style="margin-bottom:8px;">
+      <audio class="audio-item" controls src="${m.url}"></audio>
+      <button class="btn btn-ghost btn-sm existing-audio-rm" data-existing-id="${m.id}">Elimina questo audio</button>
+    </div>`).join('');
+
   return `
-  ${topbar('Nuova nota', S.selectedCantiere, true)}
+  ${topbar(isEdit ? 'Modifica nota' : 'Nuova nota', S.selectedCantiere, true)}
   <div class="content">
     ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
     <div class="card">
@@ -461,17 +484,18 @@ function screenNota() {
       </div>
       <div class="field">
         <label>Foto</label>
-        <div class="photo-strip" id="photo-stage">${photosStage}</div>
+        <div class="photo-strip" id="photo-stage">${existingPhotosHtml}${photosStage}</div>
         <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
         <button class="btn btn-ghost btn-block" id="add-photo-btn">&#128247; Aggiungi foto</button>
       </div>
       <div class="field">
         <label>Nota audio</label>
+        ${existingAudiosHtml}
         ${recControls}
         ${audioPreview}
       </div>
     </div>
-    <button class="btn btn-primary btn-block" id="save-note-btn" ${S.savingNote ? 'disabled' : ''}>${S.savingNote ? escapeHtml(S.savingLabel || 'Salvataggio…') : 'Salva nota'}</button>
+    <button class="btn btn-primary btn-block" id="save-note-btn" ${S.savingNote ? 'disabled' : ''}>${S.savingNote ? escapeHtml(S.savingLabel || 'Salvataggio…') : (isEdit ? 'Salva modifiche' : 'Salva nota')}</button>
   </div>`;
 }
 
@@ -656,6 +680,38 @@ function bindCantiereDetailEvents() {
     resetRecorder();
     goto('nota');
   });
+  document.querySelectorAll('.note-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const note = S.notes.find(n => n.id === btn.dataset.id);
+      if (!note) return;
+      NOTE_DRAFT = {
+        id: note.id,
+        date: note.date,
+        testo: note.testo,
+        photos: [],
+        removedMediaIds: [],
+        existingMedia: S.media.filter(m => m.noteId === note.id)
+      };
+      resetRecorder();
+      goto('nota');
+    });
+  });
+  document.querySelectorAll('.note-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!window.confirm('Eliminare questa nota e tutti i suoi allegati (foto/audio)? L\'operazione non si può annullare.')) return;
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      try {
+        await apiCall('deleteNote', { id });
+        S.notes = S.notes.filter(n => n.id !== id);
+        S.media = S.media.filter(m => m.noteId !== id);
+        render();
+      } catch (err) {
+        alert('Errore nell\'eliminazione: ' + err.message);
+        render();
+      }
+    });
+  });
 }
 
 function resetRecorder() {
@@ -677,10 +733,28 @@ function bindNotaEvents() {
     e.target.value = '';
     render();
   });
-  document.querySelectorAll('#photo-stage .rm').forEach(btn => {
+  document.querySelectorAll('#photo-stage .rm[data-idx]').forEach(btn => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.dataset.idx);
       NOTE_DRAFT.photos.splice(idx, 1);
+      render();
+    });
+  });
+  document.querySelectorAll('#photo-stage .rm[data-existing-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.existingId;
+      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
+      NOTE_DRAFT.removedMediaIds.push(id);
+      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
+      render();
+    });
+  });
+  document.querySelectorAll('.existing-audio-rm').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.existingId;
+      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
+      NOTE_DRAFT.removedMediaIds.push(id);
+      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
       render();
     });
   });
@@ -720,17 +794,33 @@ function bindNotaEvents() {
 
 async function saveNoteAndMedia() {
   const testo = (NOTE_DRAFT.testo || '').trim();
+  const isEdit = !!NOTE_DRAFT.id;
   const nPhotos = NOTE_DRAFT.photos.length;
   const hasAudio = !!MEDIA_REC.audioBlob;
-  if (!testo && !nPhotos && !hasAudio) {
+  const hasRemaining = testo || nPhotos || hasAudio || (NOTE_DRAFT.existingMedia || []).length;
+  if (!hasRemaining) {
     alert('Aggiungi almeno un testo, una foto o una nota audio.');
     return;
   }
   S.savingNote = true; S.savingLabel = 'Salvataggio nota…'; render();
-  const note = { id: uid('n'), cantiere: S.selectedCantiere, date: todayStr(), testo, updatedAt: new Date().toISOString() };
+  const noteId = isEdit ? NOTE_DRAFT.id : uid('n');
+  const noteDate = isEdit ? (NOTE_DRAFT.date || todayStr()) : todayStr();
+  const note = { id: noteId, cantiere: S.selectedCantiere, date: noteDate, testo, updatedAt: new Date().toISOString() };
   try {
-    S.notes.push(note);
-    await apiCall('appendNote', note); // aggiunge solo questa riga, non riscrive tutto il foglio
+    if (isEdit) {
+      await apiCall('updateNote', note);
+      const idx = S.notes.findIndex(n => n.id === noteId);
+      if (idx >= 0) S.notes[idx] = note; else S.notes.push(note);
+
+      const toRemove = NOTE_DRAFT.removedMediaIds || [];
+      for (const mediaId of toRemove) {
+        await apiCall('deleteMedia', { id: mediaId });
+        S.media = S.media.filter(m => m.id !== mediaId);
+      }
+    } else {
+      S.notes.push(note);
+      await apiCall('appendNote', note); // aggiunge solo questa riga, non riscrive tutto il foglio
+    }
 
     if (nPhotos || hasAudio) {
       S.savingLabel = `Caricamento allegati (0/${nPhotos + (hasAudio ? 1 : 0)})…`; render();
