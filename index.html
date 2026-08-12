@@ -78,11 +78,16 @@
   .add-site-tile{border:1.5px dashed var(--orange);color:var(--orange-dark);background:#FFF4EC;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;padding:18px 12px;cursor:pointer;}
 
   /* checklist operai */
-  .op-row{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+  .op-row{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+  .op-row .head{display:flex;align-items:center;gap:10px;}
   .op-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--orange);flex-shrink:0;}
   .op-row .name{flex:1;font-weight:600;font-size:14.5px;}
-  .op-row .ore-input{width:70px;text-align:center;padding:8px 4px;}
-  .op-row.off .ore-input{display:none;}
+  .op-row .ore-slider-wrap{display:none;align-items:center;gap:10px;width:100%;margin-top:12px;padding-top:2px;}
+  .op-row:not(.off) .ore-slider-wrap{display:flex;}
+  .op-row .ore-slider{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:4px;background:var(--border);outline:none;}
+  .op-row .ore-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;}
+  .op-row .ore-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;border:none;}
+  .op-row .ore-val{font-weight:700;font-size:14px;min-width:34px;text-align:right;color:var(--orange-dark);}
 
   /* timeline note */
   .note-item{background:#fff;border:1px solid var(--border-soft);border-radius:10px;padding:14px;margin-bottom:12px;}
@@ -127,7 +132,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -318,9 +323,14 @@ function screenGiornata() {
     const st = FORM.operai[w] || { presente: false, ore: 8 };
     return `
     <div class="op-row ${st.presente ? '' : 'off'}" data-worker="${escapeHtml(w)}">
-      <input type="checkbox" class="op-check" ${st.presente ? 'checked' : ''}>
-      <div class="name">${escapeHtml(w)}</div>
-      <input type="number" class="ore-input op-ore mono" min="0" max="16" step="0.5" value="${st.ore}">
+      <div class="head">
+        <input type="checkbox" class="op-check" ${st.presente ? 'checked' : ''}>
+        <div class="name">${escapeHtml(w)}</div>
+        <div class="ore-val mono">${st.ore}h</div>
+      </div>
+      <div class="ore-slider-wrap">
+        <input type="range" class="ore-slider op-ore" min="1" max="9.5" step="0.5" value="${st.ore}">
+      </div>
     </div>`;
   }).join('');
 
@@ -541,12 +551,16 @@ function bindGiornataEvents() {
   document.querySelectorAll('.op-row').forEach(row => {
     const worker = row.dataset.worker;
     const check = row.querySelector('.op-check');
-    const ore = row.querySelector('.op-ore');
+    const slider = row.querySelector('.op-ore');
+    const valEl = row.querySelector('.ore-val');
     check.addEventListener('change', () => {
       FORM.operai[worker].presente = check.checked;
       row.classList.toggle('off', !check.checked);
     });
-    ore.addEventListener('input', () => { FORM.operai[worker].ore = Number(ore.value) || 0; });
+    slider.addEventListener('input', () => {
+      FORM.operai[worker].ore = Number(slider.value);
+      valEl.textContent = Number(slider.value) + 'h';
+    });
   });
   document.getElementById('f-new-site').addEventListener('click', async e => {
     e.preventDefault();
