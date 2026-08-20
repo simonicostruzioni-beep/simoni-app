@@ -4,10 +4,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Registro Ore Cantiere</title>
+<title>Impresa Simoni</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --ink:#1F2421;
@@ -26,29 +25,26 @@
   body{margin:0;background:var(--concrete);color:var(--ink);font-family:'Inter',sans-serif;-webkit-tap-highlight-color:transparent;}
   h1,h2,h3,.disp{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em;}
   .mono{font-family:'JetBrains Mono',monospace;}
-  #app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--concrete);padding-bottom:96px;position:relative;}
-  .admin-wide #app{max-width:1100px;padding-bottom:40px;}
+  #app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--concrete);padding-bottom:30px;position:relative;}
 
   .topbar{background:var(--ink);color:var(--paper);padding:18px 20px 16px;position:sticky;top:0;z-index:20;}
   .topbar .row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
   .topbar h1{font-size:19px;margin:0;color:#fff;}
   .topbar .sub{font-size:12px;color:#C9C4B4;margin-top:2px;letter-spacing:.02em;text-transform:none;font-family:'Inter',sans-serif;}
-  .topbar-actions{display:flex;align-items:center;gap:14px;}
-  .link-btn{background:none;border:none;color:var(--orange);font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;padding:6px 4px;}
-  .link-btn:hover{text-decoration:underline;}
-  .icon-btn{background:none;border:1px solid #444943;color:#fff;border-radius:6px;padding:6px 9px;font-size:14px;cursor:pointer;}
+  .icon-btn{background:none;border:1px solid #444943;color:#fff;border-radius:6px;padding:7px 10px;font-size:15px;cursor:pointer;}
 
   .content{padding:20px;}
   .card{background:var(--paper);border:1px solid var(--border-soft);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
   label{display:block;font-size:12.5px;font-weight:600;color:var(--steel);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
-  input[type=text], input[type=password], input[type=date], select, textarea{
+  input[type=text], input[type=number], input[type=password], input[type=date], select, textarea{
     width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15.5px;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);
   }
-  textarea{resize:vertical;min-height:60px;}
+  textarea{resize:vertical;min-height:70px;}
   input:focus, select:focus, textarea:focus{outline:2px solid var(--orange);outline-offset:1px;border-color:var(--orange);}
   .field{margin-bottom:14px;}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:8px;padding:13px 18px;font-family:'Oswald',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:transform .06s ease;}
   .btn:active{transform:scale(.97);}
+  .btn:disabled{opacity:.5;cursor:default;}
   .btn-primary{background:var(--orange);color:#fff;}
   .btn-primary:hover{background:var(--orange-dark);}
   .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--border);}
@@ -56,7 +52,6 @@
   .btn-block{width:100%;}
   .btn-sm{padding:8px 12px;font-size:12.5px;}
   .err{background:#FBEAE7;border:1px solid var(--red);color:var(--red);padding:10px 12px;border-radius:8px;font-size:13.5px;margin-bottom:14px;}
-  .warn{background:#FFF4EC;border:1px solid var(--orange);color:var(--orange-dark);padding:10px 12px;border-radius:8px;font-size:13.5px;margin-bottom:14px;}
   .hint{font-size:12px;color:var(--steel);margin-top:4px;}
 
   .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
@@ -64,836 +59,874 @@
   .login-badge{width:56px;height:56px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#fff;font-family:'Oswald';font-weight:700;font-size:22px;}
   .login-card h1{text-align:center;font-size:22px;margin:0 0 4px;}
   .login-sub{text-align:center;color:var(--steel);font-size:13.5px;margin-bottom:22px;}
-  .foot-link{text-align:center;margin-top:18px;}
-  .foot-link button{font-size:12px;color:var(--steel);}
 
-  .checkrow{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border:1.5px solid var(--border);border-radius:8px;}
-  .checkrow input{width:19px;height:19px;accent-color:var(--orange);flex-shrink:0;}
-  .checkrow label{margin:0;text-transform:none;font-weight:500;font-size:14.5px;color:var(--ink);}
+  /* HOME */
+  .home-btn{display:flex;align-items:center;gap:16px;background:var(--paper);border:1.5px solid var(--border-soft);border-radius:14px;padding:20px;margin-bottom:14px;cursor:pointer;text-align:left;width:100%;}
+  .home-btn:active{transform:scale(.98);}
+  .home-btn .ic{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+  .home-btn.a .ic{background:#FFF0E4;}
+  .home-btn.b .ic{background:#E9F2EA;}
+  .home-btn.c .ic{background:#EAEEF7;}
+  .home-btn .txt h3{margin:0 0 3px;font-size:16px;}
+  .home-btn .txt p{margin:0;font-size:12.5px;color:var(--steel);font-family:'Inter';text-transform:none;letter-spacing:0;}
 
-  .slider-wrap{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:14px 14px 10px;}
-  .slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
-  .slider-val{font-family:'JetBrains Mono';font-weight:700;font-size:20px;color:var(--orange-dark);}
-  input[type=range]{width:100%;accent-color:var(--orange);height:6px;}
+  /* CANTIERI grid */
+  .site-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .site-card{background:var(--paper);border:1.5px solid var(--border-soft);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;}
+  .site-card:active{transform:scale(.97);}
+  .site-card .ic{font-size:26px;margin-bottom:8px;}
+  .site-card .name{font-family:'Oswald';font-weight:600;font-size:13.5px;text-transform:uppercase;letter-spacing:.02em;}
+  .add-site-tile{border:1.5px dashed var(--orange);color:var(--orange-dark);background:#FFF4EC;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;padding:18px 12px;cursor:pointer;}
 
-  .site-block{background:#fff;border:1.5px dashed var(--border);border-radius:8px;padding:14px;margin-bottom:12px;position:relative;}
-  .site-block-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-  .site-block-head .tag{font-family:'Oswald';font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--steel);background:var(--concrete);padding:3px 9px;border-radius:20px;}
-  .remove-block{background:none;border:none;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter';}
-  .add-site-btn{width:100%;border:1.5px dashed var(--orange);background:#FFF4EC;color:var(--orange-dark);border-radius:8px;padding:11px;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Inter';margin-bottom:16px;}
+  /* checklist operai */
+  .op-row{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+  .op-row .head{display:flex;align-items:center;gap:10px;}
+  .op-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--orange);flex-shrink:0;}
+  .op-row .name{flex:1;font-weight:600;font-size:14.5px;}
+  .op-row .ore-slider-wrap{display:none;align-items:center;gap:10px;width:100%;margin-top:12px;padding-top:2px;}
+  .op-row:not(.off) .ore-slider-wrap{display:flex;}
+  .op-row .ore-slider{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:4px;background:var(--border);outline:none;}
+  .op-row .ore-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;}
+  .op-row .ore-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;border:none;}
+  .op-row .ore-val{font-weight:700;font-size:14px;min-width:34px;text-align:right;color:var(--orange-dark);}
 
-  .total-strip{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#fff;padding:12px 16px;border-radius:8px;margin-bottom:16px;}
-  .total-strip .lbl{font-size:12px;color:#C9C4B4;text-transform:uppercase;letter-spacing:.04em;}
-  .total-strip .val{font-family:'JetBrains Mono';font-weight:700;font-size:19px;}
-
-  .actionbar{position:fixed;bottom:0;left:0;right:0;background:var(--paper);border-top:1px solid var(--border-soft);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px;max-width:520px;margin:0 auto;z-index:30;box-shadow:0 -4px 16px rgba(0,0,0,.06);}
-  .admin-wide .actionbar{display:none;}
-  .actionbar .btn{flex:1;padding:12px 6px;font-size:12.5px;}
-
-  .month-picker{display:flex;gap:8px;align-items:center;margin-bottom:14px;}
-  .month-picker select{flex:1;}
-  .stamp{width:90px;height:90px;border-radius:50%;border:3px solid var(--orange);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:6px auto 18px;transform:rotate(-6deg);}
-  .stamp .n{font-family:'JetBrains Mono';font-weight:700;font-size:22px;color:var(--orange-dark);line-height:1;}
-  .stamp .l{font-family:'Oswald';font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--orange-dark);margin-top:2px;}
-  .ticket{background:#fff;border:1px solid var(--border-soft);border-radius:6px;padding:8px 12px 8px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;position:relative;overflow:hidden;}
-  .ticket::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--orange);}
-  .ticket:hover{border-color:var(--orange);}
-  .ticket .left{display:flex;align-items:baseline;gap:9px;min-width:0;flex:1;}
-  .ticket .date{font-family:'JetBrains Mono';font-weight:700;font-size:12.5px;flex-shrink:0;}
-  .ticket .sites{font-size:12px;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ticket .hrs{font-family:'JetBrains Mono';font-weight:700;font-size:14px;color:var(--orange-dark);flex-shrink:0;}
+  /* timeline note */
+  .note-item{background:#fff;border:1px solid var(--border-soft);border-radius:10px;padding:14px;margin-bottom:12px;}
+  .note-item .date{font-family:'JetBrains Mono';font-size:11.5px;color:var(--steel);margin-bottom:6px;}
+  .note-item .txt{font-size:14.5px;line-height:1.45;white-space:pre-wrap;margin-bottom:10px;}
+  .note-item .txt:last-child{margin-bottom:0;}
+  .note-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);}
+  .note-actions .btn{flex:1;}
+  .photo-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .photo-strip img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--border-soft);}
+  .audio-item{width:100%;margin-bottom:6px;}
+  img.media-loading{background:var(--border-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3C/svg%3E") center/16px no-repeat;opacity:.6;}
   .empty-state{text-align:center;padding:40px 20px;color:var(--steel);}
   .empty-state .big{font-size:34px;margin-bottom:8px;}
 
-  .tabs{display:flex;gap:6px;padding:16px 20px 0;border-bottom:1px solid var(--border-soft);}
-  .tab-btn{background:none;border:none;padding:10px 14px;font-family:'Oswald';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--steel);cursor:pointer;border-bottom:3px solid transparent;}
-  .tab-btn.active{color:var(--orange-dark);border-bottom-color:var(--orange);}
+  /* composer nota */
+  .stage-photo{position:relative;width:84px;height:84px;border-radius:8px;overflow:hidden;border:1px solid var(--border-soft);}
+  .stage-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .stage-photo .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer;}
+  .rec-row{display:flex;align-items:center;gap:10px;}
+  .rec-dot{width:11px;height:11px;border-radius:50%;background:var(--red);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .attach-bar{display:flex;gap:8px;margin-bottom:14px;}
+  .attach-bar .btn{flex:1;}
+
+  /* quaderno */
   .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
-  .filters > div{flex:1;min-width:150px;}
-  table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;font-size:13px;}
-  th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--border-soft);}
-  th{background:var(--ink);color:#fff;font-family:'Oswald';font-weight:500;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;}
-  tbody tr:hover{background:#FFF8F0;}
-  .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border-soft);}
-  .admin-total{margin-top:12px;font-family:'JetBrains Mono';font-weight:700;text-align:right;}
-  .userrow{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center;padding:10px;background:#fff;border:1px solid var(--border-soft);border-radius:8px;margin-bottom:8px;}
-  .siterow{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#fff;border:1px solid var(--border-soft);border-radius:8px;margin-bottom:8px;}
-  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
-  .cfg-box{background:#fff;border:1px solid var(--border-soft);border-radius:8px;padding:14px;margin-top:14px;}
-  .cfg-box code{display:block;background:var(--concrete);padding:8px 10px;border-radius:6px;margin-top:6px;font-size:12px;word-break:break-all;}
-  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;margin:0 auto 14px;animation:spin 0.8s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  @media (max-width:700px){
-    .admin-wide #app{padding:0;}
-    .userrow{grid-template-columns:1fr;}
-  }
+  .filters > div{flex:1;min-width:130px;}
+  .ticket{background:#fff;border:1px solid var(--border-soft);border-radius:6px;padding:10px 12px 10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative;overflow:hidden;}
+  .ticket::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--orange);}
+  .ticket .main{flex:1;min-width:0;cursor:pointer;}
+  .ticket .date{font-family:'JetBrains Mono';font-weight:700;font-size:12.5px;}
+  .ticket .site{font-size:12.5px;color:var(--steel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ticket .hrs{font-family:'JetBrains Mono';font-weight:700;font-size:13.5px;color:var(--orange-dark);flex-shrink:0;}
+  .ticket .del{background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0;}
+
+  .fab{position:fixed;bottom:24px;left:50%;transform:translateX(calc(-50% + 210px));width:56px;height:56px;border-radius:50%;background:var(--orange);color:#fff;border:none;font-size:26px;box-shadow:0 6px 16px rgba(0,0,0,.25);cursor:pointer;z-index:25;}
+  @media (max-width:560px){ .fab{ left:auto; right:20px; transform:none; } }
+
+  .back-link{background:none;border:none;color:var(--paper);font-family:'Inter';font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:2px;}
 </style>
 </head>
 <body>
 <div id="app"></div>
 
 <script>
-/* =====================================================================
-   CONFIGURAZIONE — obbligatoria prima dell'uso
-   Incolla qui l'URL del tuo Google Apps Script Web App (vedi ISTRUZIONI.md)
-   ===================================================================== */
+/* ================= CONFIGURAZIONE ================= */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
+const SESSION_KEY = 'is_session_v1';
 
-/* Credenziali di accesso alla pagina Amministrazione (modifica pure) */
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'admin';
-
-/* ================= STATE ================= */
-const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const MOTIVI = { ferie:'Ferie', malattia:'Malattia', cassa_meteo:'Cassa meteo' };
-
+/* ================= STATO ================= */
 let S = {
-  screen: 'loading',
-  worker: null,
+  screen: 'login',
+  authed: false,
   workers: [],
   sites: [],
   entries: [],
-  editId: null,
-  viewMonth: null,
-  admin: { loggedIn:false, tab:'registro', filters:{worker:'',cantiere:'',from:'',to:''} },
-  loginErr: '', adminErr: '', loadErr: ''
+  notes: [],
+  media: [],
+  loading: false,
+  error: '',
+  editEntryId: null,
+  selectedCantiere: null,
+  quadFilters: { cantiere: '', operaio: '', from: '', to: '' }
 };
 
-/* ================= BACKEND (Google Sheet via Apps Script) ================= */
-async function apiGetAll(){
-  const res = await fetch(APPS_SCRIPT_URL + '?action=getAll');
-  if(!res.ok) throw new Error('Errore di rete (' + res.status + ')');
-  const json = await res.json();
-  if(json.error) throw new Error(json.error);
-  return json;
-}
-async function apiSave(action, data){
+let FORM = null;       // stato form giornata in corso
+let NOTE_DRAFT = null; // stato composer nota in corso
+let MEDIA_REC = { recorder: null, chunks: [], stream: null, recording: false, audioBlob: null, audioUrl: null };
+const MEDIA_CACHE = {};       // driveFileId -> object URL già scaricato/decodificato
+const MEDIA_LOADING = new Set(); // driveFileId attualmente in caricamento (evita richieste doppie)
+
+/* ================= API ================= */
+async function apiCall(action, data) {
   const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita il preflight CORS
     body: JSON.stringify({ action, data })
   });
-  const json = await res.json().catch(()=>({}));
-  if(json && json.error) throw new Error(json.error);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
   return json;
 }
+async function refreshData() {
+  S.loading = true; render();
+  try {
+    const data = await apiCall('getAll');
+    S.workers = data.workers || [];
+    S.sites = data.sites || [];
+    S.entries = data.entries || [];
+    S.notes = data.notes || [];
+    S.media = data.media || [];
+  } catch (err) {
+    S.error = 'Errore nel caricamento dati: ' + err.message;
+  }
+  S.loading = false; render();
+}
+async function saveEntriesRemote() { await apiCall('saveEntries', S.entries); }
+async function saveNotesRemote() { await apiCall('saveNotes', S.notes); }
+async function saveSitesRemote() { await apiCall('saveSites', S.sites); }
 
-/* Sessione locale (ricorda l'operaio su questo dispositivo) */
-function getSession(){ try{ return JSON.parse(localStorage.getItem('rc_session') || 'null'); }catch(e){ return null; } }
-function setSession(obj){ try{ localStorage.setItem('rc_session', JSON.stringify(obj)); }catch(e){} }
-function clearSession(){ try{ localStorage.removeItem('rc_session'); }catch(e){} }
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+/* Ridimensiona e comprime una foto prima di spedirla, per velocizzare drasticamente l'upload */
+function compressImage(file, maxDim = 1600, quality = 0.72) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else if (height > maxDim) { width = Math.round(width * maxDim / height); height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Compressione immagine fallita')), 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadMediaRemote(cantiere, noteId, tipo, filename, mimeType, base64) {
+  return apiCall('uploadMedia', { cantiere, noteId, tipo, filename, mimeType, base64 });
+}
 
 /* ================= UTIL ================= */
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
-function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
-function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
-function monthKey(iso){ return iso ? iso.slice(0,7) : ''; }
-function monthLabel(mk){ if(!mk) return ''; const [y,m]=mk.split('-'); return `${MESI[parseInt(m,10)-1]} ${y}`; }
-function fmtHrs(n){ n = Math.round(n*10)/10; return (n % 1 === 0) ? String(n) : String(n).replace('.', ','); }
-function setBodyClass(){ document.body.className = (S.screen==='admin' || S.screen==='adminlogin') ? 'admin-wide' : ''; }
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function fmtDate(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function uid(prefix) {
+  return prefix + '_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+}
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function goto(screen) { S.screen = screen; S.error = ''; render(); window.scrollTo(0, 0); }
 
-/* ================= INIT ================= */
-async function init(){
-  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('INCOLLA_QUI') === 0){
-    S.screen = 'configerror';
-    S.loadErr = 'missing-url';
-    render();
-    return;
-  }
-  try{
-    const all = await apiGetAll();
-    S.workers = all.workers || [];
-    S.sites = (all.sites && all.sites.length) ? all.sites : [];
-    S.entries = all.entries || [];
-  }catch(err){
-    S.screen = 'configerror';
-    S.loadErr = err.message || String(err);
-    render();
-    return;
-  }
-  const session = getSession();
-  if(session && session.name && S.workers.some(w=>w.name===session.name)){
-    S.worker = session.name;
-    S.screen = 'main';
-  } else {
-    S.screen = 'login';
-  }
-  render();
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+function hasSession() { return localStorage.getItem(SESSION_KEY) === '1'; }
+
+/* ================= FORM GIORNATA ================= */
+function freshGiornataForm() {
+  const operai = {};
+  S.workers.forEach(w => { operai[w] = { presente: false, ore: 8 }; });
+  return { date: todayStr(), cantiere: S.sites[0] || '', lavorazioni: '', materiali: '', operai };
+}
+function loadGiornataForm(entry) {
+  const operai = {};
+  S.workers.forEach(w => { operai[w] = { presente: false, ore: 8 }; });
+  (entry.operai || []).forEach(o => { operai[o.nome] = { presente: true, ore: o.ore }; });
+  return { date: entry.date, cantiere: entry.cantiere, lavorazioni: entry.lavorazioni, materiali: entry.materiali, operai };
 }
 
-async function refreshData(){
-  try{
-    const all = await apiGetAll();
-    S.workers = all.workers || [];
-    S.sites = all.sites || [];
-    S.entries = all.entries || [];
-  }catch(err){
-    alert('Impossibile aggiornare i dati: ' + (err.message||err));
-  }
-}
-
-/* ================= NAV HELPERS ================= */
-function goto(screen){ S.screen = screen; render(); }
-
-function freshForm(){
-  const lastEntry = S.entries.filter(e=>e.worker===S.worker).sort((a,b)=> (b.date+ (b.updatedAt||'')).localeCompare(a.date+(a.updatedAt||'')))[0];
-  const defaultSite = (lastEntry && lastEntry.sites[0] && lastEntry.sites[0].cantiere) || S.sites[0] || '';
-  return {
-    date: todayStr(),
-    pranzoACasa: false,
-    missingType: '',
-    sites: [{ cantiere: defaultSite, ore: 8, lavorazioni:'', materiali:'' }]
-  };
-}
-
-let CURRENT_FORM = null;
-
-/* ================= RENDER ROOT ================= */
-function render(){
-  setBodyClass();
+/* ================= RENDER ================= */
+function render() {
   const app = document.getElementById('app');
-  if(S.screen==='loading') app.innerHTML = `<div style="padding:80px 20px;text-align:center;color:var(--steel)"><div class="spinner"></div>Caricamento dati dal foglio Google…</div>`;
-  else if(S.screen==='configerror') app.innerHTML = renderConfigError();
-  else if(S.screen==='login') app.innerHTML = renderLogin();
-  else if(S.screen==='main') { CURRENT_FORM = S.editId ? loadFormFromEntry(S.editId) : (CURRENT_FORM && CURRENT_FORM._keep ? CURRENT_FORM : freshForm()); app.innerHTML = renderMain(); }
-  else if(S.screen==='view') app.innerHTML = renderView();
-  else if(S.screen==='adminlogin') app.innerHTML = renderAdminLogin();
-  else if(S.screen==='admin') app.innerHTML = renderAdmin();
-  attachHandlers();
+  app.innerHTML = renderScreen();
+  bindEvents();
+  hydrateMediaElements();
 }
 
-/* ================= CONFIG ERROR SCREEN ================= */
-function renderConfigError(){
-  const missingUrl = S.loadErr === 'missing-url';
-  return `
-  <div class="login-wrap">
-    <div class="login-card" style="max-width:460px">
-      <div class="login-badge" style="background:var(--red)">!</div>
-      <h1>Configurazione richiesta</h1>
-      ${missingUrl ? `
-        <div class="warn">Nel file <b>index.html</b> devi incollare l'URL del tuo Google Apps Script al posto di <code class="mono">INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT</code>.</div>
-        <p style="font-size:13.5px;color:var(--steel)">Segui le istruzioni in <b>ISTRUZIONI.md</b> per creare il Google Sheet, pubblicare lo script e collegarlo qui.</p>
-      ` : `
-        <div class="err">Non riesco a contattare il foglio Google.<br><span class="mono" style="font-size:12px">${escapeHtml(S.loadErr)}</span></div>
-        <p style="font-size:13.5px;color:var(--steel)">Controlla che:</p>
-        <ul style="font-size:13.5px;color:var(--steel);padding-left:18px">
-          <li>l'URL Apps Script sia corretto e completo</li>
-          <li>il deployment sia impostato su "Chiunque abbia accesso"</li>
-          <li>il telefono/computer sia connesso a internet</li>
-        </ul>
-        <button class="btn btn-primary btn-block" id="retry-btn" style="margin-top:10px">Riprova</button>
-      `}
-    </div>
-  </div>`;
+/* Scarica (via JSON base64) le foto/audio presenti a video ma non ancora caricati,
+   e li applica come src una volta pronti. Usa una cache così ogni file si scarica una sola volta. */
+async function hydrateMediaElements() {
+  const els = Array.from(document.querySelectorAll('[data-media-file]'));
+  for (const el of els) {
+    const fileId = el.dataset.mediaFile;
+    if (!fileId) continue;
+    if (MEDIA_CACHE[fileId]) {
+      el.src = MEDIA_CACHE[fileId];
+      el.classList.remove('media-loading');
+      continue;
+    }
+    if (MEDIA_LOADING.has(fileId)) continue;
+    MEDIA_LOADING.add(fileId);
+    try {
+      const res = await apiCall('getFile', { id: fileId });
+      if (res.base64) {
+        const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
+        const blob = new Blob([bytes], { type: res.mimeType || 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        MEDIA_CACHE[fileId] = url;
+        document.querySelectorAll(`[data-media-file="${fileId}"]`).forEach(node => {
+          node.src = url;
+          node.classList.remove('media-loading');
+        });
+      }
+    } catch (err) {
+      console.error('Errore caricamento media', fileId, err);
+    } finally {
+      MEDIA_LOADING.delete(fileId);
+    }
+  }
 }
 
-/* ================= LOGIN (OPERAIO) ================= */
-function renderLogin(){
-  const options = S.workers.map(w=>`<option value="${escapeHtml(w.name)}">${escapeHtml(w.name)}</option>`).join('');
-  return `
-  <div class="login-wrap">
-    <div class="login-card">
-      <div class="login-badge">RC</div>
-      <h1>Registro Ore</h1>
-      <div class="login-sub">Accedi con il nome e la password che ti ha dato l'ufficio</div>
-      ${S.loginErr ? `<div class="err">${escapeHtml(S.loginErr)}</div>` : ''}
-      ${S.workers.length===0 ? `<div class="err">Nessun operaio configurato. Contatta l'amministratore.</div>` : `
-      <form id="login-form">
-        <div class="field">
-          <label>Nome</label>
-          <select id="login-name" required>${options}</select>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input type="password" id="login-pass" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Entra</button>
-      </form>`}
-      <div class="foot-link"><button id="go-admin">Amministrazione →</button></div>
-    </div>
-  </div>`;
+function renderScreen() {
+  if (S.screen === 'login') return screenLogin();
+  if (S.screen === 'home') return screenHome();
+  if (S.screen === 'giornata') return screenGiornata();
+  if (S.screen === 'cantieri') return screenCantieri();
+  if (S.screen === 'cantiere') return screenCantiereDetail();
+  if (S.screen === 'nota') return screenNota();
+  if (S.screen === 'quaderno') return screenQuaderno();
+  return '<div class="content">Schermata non trovata.</div>';
 }
 
-/* ================= MAIN (INSERIMENTO / MODIFICA) ================= */
-function siteBlockHtml(site, idx, removable){
-  return `
-  <div class="site-block" data-idx="${idx}">
-    <div class="site-block-head">
-      <span class="tag">Cantiere ${idx+1}</span>
-      ${removable ? `<button type="button" class="remove-block">Rimuovi</button>` : ''}
-    </div>
-    <div class="field">
-      <label>Cantiere</label>
-      <select class="f-cantiere site-select">
-        ${S.sites.map(s=>`<option value="${escapeHtml(s)}" ${s===site.cantiere?'selected':''}>${escapeHtml(s)}</option>`).join('')}
-        <option value="__new__">+ Nuovo cantiere…</option>
-      </select>
-    </div>
-    <div class="field">
-      <div class="slider-top"><label style="margin:0">Ore lavorate</label><span class="slider-val f-ore-val">${fmtHrs(site.ore)}</span></div>
-      <div class="slider-wrap">
-        <input type="range" class="f-ore" min="0" max="9" step="0.5" value="${site.ore}">
-      </div>
-    </div>
-    <div class="field">
-      <label>Lavorazioni</label>
-      <textarea class="f-lav" placeholder="Descrivi le lavorazioni svolte…">${escapeHtml(site.lavorazioni)}</textarea>
-    </div>
-    <div class="field" style="margin-bottom:0">
-      <label>Materiali e attrezzature</label>
-      <textarea class="f-mat" placeholder="Materiali/attrezzature utilizzati…">${escapeHtml(site.materiali)}</textarea>
-    </div>
-  </div>`;
-}
-
-function loadFormFromEntry(id){
-  const e = S.entries.find(x=>x.id===id);
-  if(!e) return freshForm();
-  return { date:e.date, pranzoACasa:e.pranzoACasa, missingType:e.missingType||'', sites: e.sites.map(s=>({...s})) };
-}
-
-function renderMain(){
-  const f = CURRENT_FORM;
-  const editing = !!S.editId;
-  const total = f.sites.reduce((a,s)=>a+Number(s.ore||0),0);
+function topbar(title, sub, showBack) {
+  const subText = S.loading ? 'Aggiornamento dati…' : sub;
   return `
   <div class="topbar">
     <div class="row">
       <div>
-        <h1>${editing? 'Modifica registrazione':'Registro Ore'}</h1>
-        <div class="sub">Operaio: ${escapeHtml(S.worker)}</div>
+        ${showBack ? `<button class="back-link" id="back-btn">&larr; Indietro</button>` : ''}
+        <h1>${escapeHtml(title)}</h1>
+        ${subText ? `<div class="sub">${escapeHtml(subText)}</div>` : ''}
       </div>
-      <button class="link-btn" id="logout-btn">Cambia utente</button>
+      <button class="icon-btn" id="refresh-btn" title="Aggiorna" ${S.loading ? 'disabled' : ''}>&#8635;</button>
     </div>
-  </div>
+  </div>`;
+}
+
+function screenLoadingShell() {
+  return `${topbar('Impresa Simoni', 'Caricamento dati…')}<div class="content"><div class="empty-state"><div class="big">&#9203;</div>Caricamento in corso…</div></div>`;
+}
+
+function screenLogin() {
+  return `
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-badge">IS</div>
+      <h1>Impresa Simoni</h1>
+      <div class="login-sub">Accesso riservato a capocantiere e amministratore</div>
+      ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+      <form id="login-form">
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="login-pass" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Entra</button>
+      </form>
+    </div>
+  </div>`;
+}
+
+function screenHome() {
+  return `
+  ${topbar('Impresa Simoni', 'Cosa vuoi fare?')}
   <div class="content">
-    ${editing ? `<div class="warn">Stai modificando una registrazione esistente.</div>` : ''}
-    ${S.sites.length===0 ? `<div class="warn">Non ci sono ancora cantieri configurati: creane uno dal menu a tendina qui sotto.</div>` : ''}
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    <button class="home-btn a" id="go-giornata">
+      <div class="ic">&#128203;</div>
+      <div class="txt"><h3>Inserisci giornata</h3><p>Ore lavorate, cantiere e lavorazioni di oggi</p></div>
+    </button>
+    <button class="home-btn b" id="go-cantieri">
+      <div class="ic">&#127959;&#65039;</div>
+      <div class="txt"><h3>Cantieri</h3><p>Note, foto e audio per ciascun cantiere</p></div>
+    </button>
+    <button class="home-btn c" id="go-quaderno">
+      <div class="ic">&#128214;</div>
+      <div class="txt"><h3>Quaderno cantieri</h3><p>Storico giornate, filtri, modifica</p></div>
+    </button>
+  </div>`;
+}
+
+function screenGiornata() {
+  if (!FORM) FORM = S.editEntryId ? loadGiornataForm(S.entries.find(e => e.id === S.editEntryId)) : freshGiornataForm();
+  S.workers.forEach(w => { if (!FORM.operai[w]) FORM.operai[w] = { presente: false, ore: 8 }; });
+  if (!FORM.cantiere && S.sites.length) FORM.cantiere = S.sites[0];
+  const isEdit = !!S.editEntryId;
+  const opRows = S.workers.map(w => {
+    const st = FORM.operai[w] || { presente: false, ore: 8 };
+    return `
+    <div class="op-row ${st.presente ? '' : 'off'}" data-worker="${escapeHtml(w)}">
+      <div class="head">
+        <input type="checkbox" class="op-check" ${st.presente ? 'checked' : ''}>
+        <div class="name">${escapeHtml(w)}</div>
+        <div class="ore-val mono">${st.ore}h</div>
+      </div>
+      <div class="ore-slider-wrap">
+        <input type="range" class="ore-slider op-ore" min="1" max="9.5" step="0.5" value="${st.ore}">
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  ${topbar(isEdit ? 'Modifica giornata' : 'Inserisci giornata', '', true)}
+  <div class="content">
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
     <div class="card">
       <div class="field">
         <label>Data</label>
-        <input type="date" id="f-date" value="${f.date}">
+        <input type="date" id="f-date" value="${FORM.date}">
       </div>
-
-      <div id="sites-container">
-        ${f.sites.map((s,i)=>siteBlockHtml(s,i, f.sites.length>1)).join('')}
-      </div>
-      <button type="button" class="add-site-btn" id="add-site-btn">+ Aggiungi un altro cantiere</button>
-
-      <div class="total-strip">
-        <span class="lbl">Totale ore giorno</span>
-        <span class="val mono" id="total-display">${fmtHrs(total)} h</span>
-      </div>
-
-      <div id="missing-wrap" class="field" style="${total<8 ? '' : 'display:none'}">
-        <label>Le ore mancanti (per arrivare a 8) sono da considerare come</label>
-        <select id="f-missing">
-          <option value="">Seleziona…</option>
-          <option value="ferie" ${f.missingType==='ferie'?'selected':''}>Ferie</option>
-          <option value="malattia" ${f.missingType==='malattia'?'selected':''}>Malattia</option>
-          <option value="cassa_meteo" ${f.missingType==='cassa_meteo'?'selected':''}>Cassa meteo</option>
+      <div class="field">
+        <label>Cantiere</label>
+        <select id="f-cantiere">
+          ${S.sites.map(s => `<option value="${escapeHtml(s)}" ${s === FORM.cantiere ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
         </select>
+        <div class="hint">Non trovi il cantiere? <a href="#" id="f-new-site">Aggiungine uno nuovo</a></div>
       </div>
-
-      <div class="field" style="margin-bottom:0">
-        <div class="checkrow">
-          <input type="checkbox" id="f-pranzo" ${f.pranzoACasa?'checked':''}>
-          <label for="f-pranzo">Pranzato a casa</label>
-        </div>
+      <div class="field">
+        <label>Operai presenti e ore</label>
+        ${S.workers.length ? opRows : `<div class="hint">Nessun operaio configurato: aggiungili dalla pagina Admin.</div>`}
+      </div>
+      <div class="field">
+        <label>Lavorazioni effettuate</label>
+        <textarea id="f-lavorazioni" placeholder="Es. scavo fondazioni, posa tubi...">${escapeHtml(FORM.lavorazioni)}</textarea>
+      </div>
+      <div class="field">
+        <label>Materiali utilizzati</label>
+        <textarea id="f-materiali" placeholder="Es. 20 sacchi cemento, tubi PVC...">${escapeHtml(FORM.materiali)}</textarea>
       </div>
     </div>
-    ${editing ? `<button type="button" class="btn btn-danger btn-block" id="delete-entry-btn" style="margin-bottom:12px">Elimina questa registrazione</button>` : ''}
-  </div>
-
-  <div class="actionbar">
-    <button class="btn btn-ghost" id="reset-btn">Reset</button>
-    <button class="btn btn-ghost" id="visualizza-btn">Visualizza</button>
-    <button class="btn btn-primary" id="salva-btn">${editing?'Salva modifiche':'Salva'}</button>
+    <button class="btn btn-primary btn-block" id="save-giornata-btn">${isEdit ? 'Salva modifiche' : 'Salva giornata'}</button>
+    ${isEdit ? `<button class="btn btn-danger btn-block" id="delete-giornata-btn" style="margin-top:10px;">Elimina giornata</button>` : ''}
   </div>`;
 }
 
-function collectFormFromDom(){
-  const date = document.getElementById('f-date').value || todayStr();
-  const pranzoACasa = document.getElementById('f-pranzo').checked;
-  const missingSel = document.getElementById('f-missing');
-  const missingType = missingSel ? missingSel.value : '';
-  const blocks = Array.from(document.querySelectorAll('.site-block')).map(b=>({
-    cantiere: b.querySelector('.f-cantiere').value,
-    ore: Number(b.querySelector('.f-ore').value),
-    lavorazioni: b.querySelector('.f-lav').value.trim(),
-    materiali: b.querySelector('.f-mat').value.trim()
-  }));
-  return { date, pranzoACasa, missingType, sites: blocks };
-}
-
-function recomputeTotalUI(){
-  const blocks = Array.from(document.querySelectorAll('.site-block'));
-  let total = 0;
-  blocks.forEach(b=>{
-    const r = b.querySelector('.f-ore');
-    const v = Number(r.value);
-    b.querySelector('.f-ore-val').textContent = fmtHrs(v);
-    total += v;
-  });
-  const disp = document.getElementById('total-display');
-  if(disp) disp.textContent = fmtHrs(total)+' h';
-  const wrap = document.getElementById('missing-wrap');
-  if(wrap) wrap.style.display = total < 8 ? '' : 'none';
-}
-
-function wireSiteSelect(sel){
-  sel.addEventListener('change', function(){
-    if(this.value==='__new__'){
-      const name = window.prompt('Nome del nuovo cantiere:');
-      if(name && name.trim()){
-        const clean = name.trim();
-        if(!S.sites.includes(clean)){ S.sites.push(clean); apiSave('saveSites', S.sites).catch(()=>{}); }
-        document.querySelectorAll('.site-select').forEach(s2=>{
-          if(!Array.from(s2.options).some(o=>o.value===clean)){
-            const opt = document.createElement('option'); opt.value=clean; opt.textContent=clean;
-            s2.insertBefore(opt, s2.lastElementChild);
-          }
-        });
-        this.value = clean;
-      } else { this.value = S.sites[0] || ''; }
-    }
-  });
-}
-
-/* ================= VIEW (VISUALIZZAZIONE) ================= */
-function renderView(){
-  const mine = S.entries.filter(e=>e.worker===S.worker).sort((a,b)=>{
-    const d = b.date.localeCompare(a.date);
-    if(d !== 0) return d;
-    return String(b.updatedAt||'').localeCompare(String(a.updatedAt||''));
-  });
-  const months = Array.from(new Set(mine.map(e=>monthKey(e.date))));
-  const curMonth = monthKey(todayStr());
-  if(!months.includes(curMonth)) months.unshift(curMonth);
-  months.sort().reverse();
-  const selMonth = (S.viewMonth && months.includes(S.viewMonth)) ? S.viewMonth : months[0];
-  const filtered = mine.filter(e=>monthKey(e.date)===selMonth);
-  const totalMonth = filtered.reduce((a,e)=>a+Number(e.totalOre||0),0);
-
+function screenCantieri() {
+  const tiles = S.sites.map(s => `
+    <div class="site-card" data-site="${escapeHtml(s)}">
+      <div class="ic">&#127959;&#65039;</div>
+      <div class="name">${escapeHtml(s)}</div>
+    </div>`).join('');
   return `
-  <div class="topbar">
-    <div class="row">
-      <div><h1>Le mie ore</h1><div class="sub">Operaio: ${escapeHtml(S.worker)}</div></div>
-      <div class="topbar-actions">
-        <button class="icon-btn" id="refresh-btn" title="Aggiorna dati">🔄</button>
-        <button class="link-btn" id="logout-btn">Cambia utente</button>
-      </div>
-    </div>
-  </div>
+  ${topbar('Cantieri', 'Seleziona un cantiere', true)}
   <div class="content">
-    <div class="month-picker">
-      <select id="month-select">
-        ${months.map(m=>`<option value="${m}" ${m===selMonth?'selected':''}>${monthLabel(m)}</option>`).join('')}
-      </select>
-    </div>
-    <div class="stamp">
-      <div class="n">${fmtHrs(totalMonth)}</div>
-      <div class="l">Ore totali</div>
-    </div>
-
-    ${filtered.length===0 ? `
-      <div class="empty-state">
-        <div class="big">🗒️</div>
-        Nessuna registrazione per ${monthLabel(selMonth)}.
-      </div>` :
-      filtered.map(e=>`
-      <div class="ticket" data-id="${e.id}">
-        <div class="left">
-          <span class="date">${fmtDate(e.date)}</span>
-          <span class="sites">${escapeHtml(e.sites.map(s=>s.cantiere).join(', '))}</span>
-        </div>
-        <div class="hrs">${fmtHrs(e.totalOre)} h</div>
-      </div>`).join('')
-    }
-  </div>
-  <div class="actionbar">
-    <button class="btn btn-ghost" id="exit-btn">Esci</button>
-    <button class="btn btn-primary" id="new-entry-btn">+ Nuova voce</button>
-  </div>`;
-}
-
-/* ================= ADMIN LOGIN ================= */
-function renderAdminLogin(){
-  return `
-  <div class="login-wrap">
-    <div class="login-card">
-      <div class="login-badge" style="background:var(--ink)">A</div>
-      <h1>Amministrazione</h1>
-      <div class="login-sub">Accesso riservato</div>
-      ${S.adminErr ? `<div class="err">${escapeHtml(S.adminErr)}</div>` : ''}
-      <form id="admin-login-form">
-        <div class="field"><label>Utente</label><input type="text" id="admin-user" required autocomplete="username"></div>
-        <div class="field"><label>Password</label><input type="password" id="admin-pass" required autocomplete="current-password"></div>
-        <button type="submit" class="btn btn-primary btn-block">Accedi</button>
-      </form>
-      <div class="foot-link"><button id="back-to-login">← Torna al login operai</button></div>
-    </div>
-  </div>`;
-}
-
-/* ================= ADMIN ================= */
-function flattenRows(){
-  const rows = [];
-  S.entries.forEach(e=>{
-    e.sites.forEach(s=>{
-      rows.push({
-        entryId:e.id, date:e.date, worker:e.worker, cantiere:s.cantiere, ore:Number(s.ore||0),
-        pranzo:e.pranzoACasa, missing: e.totalOre<8 ? (MOTIVI[e.missingType]||'') : '',
-        lavorazioni:s.lavorazioni, materiali:s.materiali
-      });
-    });
-  });
-  return rows.sort((a,b)=> b.date.localeCompare(a.date));
-}
-
-function renderAdmin(){
-  const tab = S.admin.tab;
-  return `
-  <div class="topbar">
-    <div class="row">
-      <div><h1>Amministrazione</h1><div class="sub">Registro ore cantiere</div></div>
-      <div class="topbar-actions">
-        <button class="icon-btn" id="refresh-btn" title="Aggiorna dati">🔄</button>
-        <button class="link-btn" id="admin-logout">Esci</button>
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    <div class="site-grid">
+      ${tiles}
+      <div class="add-site-tile" id="add-site-tile">
+        <div class="ic">&#65291;</div>
+        <div class="name">Nuovo cantiere</div>
       </div>
     </div>
-    <div class="tabs">
-      <button class="tab-btn ${tab==='registro'?'active':''}" data-tab="registro">Registro ore</button>
-      <button class="tab-btn ${tab==='utenti'?'active':''}" data-tab="utenti">Operai</button>
-      <button class="tab-btn ${tab==='cantieri'?'active':''}" data-tab="cantieri">Cantieri</button>
-    </div>
-  </div>
+  </div>`;
+}
+
+function screenCantiereDetail() {
+  const site = S.selectedCantiere;
+  const notes = S.notes.filter(n => n.cantiere === site).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+  const items = notes.map(n => {
+    const photos = S.media.filter(m => m.noteId === n.id && m.tipo === 'foto');
+    const audios = S.media.filter(m => m.noteId === n.id && m.tipo === 'audio');
+    return `
+    <div class="note-item">
+      <div class="date">${fmtDate(n.date)}</div>
+      ${n.testo ? `<div class="txt">${escapeHtml(n.testo)}</div>` : ''}
+      ${photos.length ? `<div class="photo-strip">${photos.map(p => `<img class="media-loading" data-media-file="${p.driveFileId}" alt="foto">`).join('')}</div>` : ''}
+      ${audios.map(a => `<audio class="audio-item" controls data-media-file="${a.driveFileId}"></audio>`).join('')}
+      <div class="note-actions">
+        <button class="btn btn-ghost btn-sm note-edit" data-id="${n.id}">Modifica</button>
+        <button class="btn btn-danger btn-sm note-del" data-id="${n.id}">Elimina</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  ${topbar(site, 'Note, foto e audio', true)}
   <div class="content">
-    ${tab==='registro' ? renderAdminRegistro() : tab==='utenti' ? renderAdminUtenti() : renderAdminCantieri()}
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    ${notes.length ? items : `<div class="empty-state"><div class="big">&#128221;</div>Nessuna nota per questo cantiere.<br>Tocca + per aggiungerne una.</div>`}
+  </div>
+  <button class="fab" id="add-note-fab" title="Aggiungi nota">&#65291;</button>`;
+}
+
+function screenNota() {
+  if (!NOTE_DRAFT) NOTE_DRAFT = { photos: [] };
+  if (!NOTE_DRAFT.existingMedia) NOTE_DRAFT.existingMedia = [];
+  const isEdit = !!NOTE_DRAFT.id;
+  const existingPhotos = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'foto');
+  const existingAudios = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'audio');
+
+  const audioPreview = MEDIA_REC.audioUrl
+    ? `<audio class="audio-item" controls src="${MEDIA_REC.audioUrl}"></audio>
+       <button class="btn btn-ghost btn-sm" id="discard-audio-btn">Elimina registrazione</button>`
+    : '';
+  const recControls = MEDIA_REC.recording
+    ? `<div class="rec-row"><span class="rec-dot"></span> Registrazione in corso… <button class="btn btn-danger btn-sm" id="stop-rec-btn">Ferma</button></div>`
+    : `<button class="btn btn-ghost btn-block" id="start-rec-btn">&#127908; Registra nuova nota audio</button>`;
+
+  const existingPhotosHtml = existingPhotos.map(m => `
+    <div class="stage-photo">
+      <img class="media-loading" data-media-file="${m.driveFileId}">
+      <button class="rm" data-existing-id="${m.id}">&times;</button>
+    </div>`).join('');
+
+  const photosStage = NOTE_DRAFT.photos.map((p, i) => `
+    <div class="stage-photo">
+      <img src="${p.previewUrl}">
+      <button class="rm" data-idx="${i}">&times;</button>
+    </div>`).join('');
+
+  const existingAudiosHtml = existingAudios.map(m => `
+    <div style="margin-bottom:8px;">
+      <audio class="audio-item" controls data-media-file="${m.driveFileId}"></audio>
+      <button class="btn btn-ghost btn-sm existing-audio-rm" data-existing-id="${m.id}">Elimina questo audio</button>
+    </div>`).join('');
+
+  return `
+  ${topbar(isEdit ? 'Modifica nota' : 'Nuova nota', S.selectedCantiere, true)}
+  <div class="content">
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    <div class="card">
+      <div class="field">
+        <label>Nota / commento</label>
+        <textarea id="n-testo" placeholder="Scrivi qui informazioni, osservazioni, aggiornamenti...">${escapeHtml(NOTE_DRAFT.testo || '')}</textarea>
+      </div>
+      <div class="field">
+        <label>Foto</label>
+        <div class="photo-strip" id="photo-stage">${existingPhotosHtml}${photosStage}</div>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
+        <button class="btn btn-ghost btn-block" id="add-photo-btn">&#128247; Aggiungi foto</button>
+      </div>
+      <div class="field">
+        <label>Nota audio</label>
+        ${existingAudiosHtml}
+        ${recControls}
+        ${audioPreview}
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="save-note-btn" ${S.savingNote ? 'disabled' : ''}>${S.savingNote ? escapeHtml(S.savingLabel || 'Salvataggio…') : (isEdit ? 'Salva modifiche' : 'Salva nota')}</button>
   </div>`;
 }
 
-function renderAdminRegistro(){
-  const f = S.admin.filters;
-  let rows = flattenRows();
-  if(f.worker) rows = rows.filter(r=>r.worker===f.worker);
-  if(f.cantiere) rows = rows.filter(r=>r.cantiere===f.cantiere);
-  if(f.from) rows = rows.filter(r=>r.date>=f.from);
-  if(f.to) rows = rows.filter(r=>r.date<=f.to);
-  const total = rows.reduce((a,r)=>a+r.ore,0);
+function screenQuaderno() {
+  const f = S.quadFilters;
+  let rows = S.entries.slice();
+  if (f.cantiere) rows = rows.filter(e => e.cantiere === f.cantiere);
+  if (f.operaio) rows = rows.filter(e => (e.operai || []).some(o => o.nome === f.operaio));
+  if (f.from) rows = rows.filter(e => e.date >= f.from);
+  if (f.to) rows = rows.filter(e => e.date <= f.to);
+  rows.sort((a, b) => b.date.localeCompare(a.date));
+
+  const tickets = rows.map(e => {
+    const tot = (e.operai || []).reduce((s, o) => s + (Number(o.ore) || 0), 0);
+    return `
+    <div class="ticket">
+      <div class="main" data-id="${e.id}">
+        <div class="date mono">${fmtDate(e.date)}</div>
+        <div class="site">${escapeHtml(e.cantiere)}</div>
+      </div>
+      <div class="hrs mono">${tot}h</div>
+      <button class="del" data-id="${e.id}" title="Elimina">&#128465;</button>
+    </div>`;
+  }).join('');
 
   return `
-  <div class="toolbar">
-    <div class="filters" style="flex:1">
-      <div>
-        <label>Operaio</label>
-        <select id="fl-worker">
-          <option value="">Tutti</option>
-          ${S.workers.map(w=>`<option value="${escapeHtml(w.name)}" ${f.worker===w.name?'selected':''}>${escapeHtml(w.name)}</option>`).join('')}
-        </select>
-      </div>
+  ${topbar('Quaderno cantieri', 'Storico giornate', true)}
+  <div class="content">
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    <div class="filters">
       <div>
         <label>Cantiere</label>
-        <select id="fl-cantiere">
+        <select id="qf-cantiere">
           <option value="">Tutti</option>
-          ${S.sites.map(s=>`<option value="${escapeHtml(s)}" ${f.cantiere===s?'selected':''}>${escapeHtml(s)}</option>`).join('')}
+          ${S.sites.map(s => `<option value="${escapeHtml(s)}" ${f.cantiere === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
         </select>
       </div>
-      <div><label>Da</label><input type="date" id="fl-from" value="${f.from}"></div>
-      <div><label>A</label><input type="date" id="fl-to" value="${f.to}"></div>
+      <div>
+        <label>Operaio</label>
+        <select id="qf-operaio">
+          <option value="">Tutti</option>
+          ${S.workers.map(w => `<option value="${escapeHtml(w)}" ${f.operaio === w ? 'selected' : ''}>${escapeHtml(w)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>Da</label>
+        <input type="date" id="qf-from" value="${f.from}">
+      </div>
+      <div>
+        <label>A</label>
+        <input type="date" id="qf-to" value="${f.to}">
+      </div>
     </div>
-    <button class="btn btn-primary btn-sm" id="export-btn">Esporta .xlsx</button>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th>Data</th><th>Operaio</th><th>Cantiere</th><th>Ore</th><th>Pranzo a casa</th><th>Ore mancanti</th><th>Lavorazioni</th><th>Materiali/attrezz.</th>
-      </tr></thead>
-      <tbody>
-        ${rows.length===0 ? `<tr><td colspan="8" style="text-align:center;color:var(--steel);padding:24px">Nessun dato per i filtri selezionati.</td></tr>` :
-        rows.map(r=>`<tr>
-          <td class="mono">${fmtDate(r.date)}</td>
-          <td>${escapeHtml(r.worker)}</td>
-          <td>${escapeHtml(r.cantiere)}</td>
-          <td class="mono">${fmtHrs(r.ore)}</td>
-          <td>${r.pranzo?'Sì':'No'}</td>
-          <td>${escapeHtml(r.missing)}</td>
-          <td>${escapeHtml(r.lavorazioni)}</td>
-          <td>${escapeHtml(r.materiali)}</td>
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-  <div class="admin-total">Totale ore: ${fmtHrs(total)} h · ${rows.length} righe</div>
-  <div class="cfg-box">
-    <b>Foglio Google collegato.</b> Puoi anche aprire direttamente il tuo Google Sheet per consultare o esportare i dati manualmente in qualsiasi momento.
-  </div>
-  `;
+    ${rows.length ? tickets : `<div class="empty-state"><div class="big">&#128203;</div>Nessuna giornata trovata.</div>`}
+  </div>`;
 }
 
-function renderAdminUtenti(){
-  return `
-  <h3 style="margin-top:0">Operai</h3>
-  <div id="users-list">
-    ${S.workers.map((w,i)=>`
-      <div class="userrow" data-idx="${i}">
-        <input type="text" class="u-name" value="${escapeHtml(w.name)}" placeholder="Nome">
-        <input type="text" class="u-pass" value="${escapeHtml(w.password)}" placeholder="Password">
-        <button class="btn btn-ghost btn-sm u-save">Salva</button>
-        <button class="btn btn-danger btn-sm u-del">Elimina</button>
-      </div>
-    `).join('') || `<div class="hint">Nessun operaio configurato.</div>`}
-  </div>
-  <h3>Aggiungi operaio</h3>
-  <div class="userrow" style="grid-template-columns:1fr 1fr auto">
-    <input type="text" id="new-u-name" placeholder="Nome">
-    <input type="text" id="new-u-pass" placeholder="Password">
-    <button class="btn btn-primary btn-sm" id="add-user-btn">Aggiungi</button>
-  </div>
-  `;
-}
+/* ================= EVENTI ================= */
+function bindEvents() {
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) backBtn.addEventListener('click', () => {
+    if (S.screen === 'cantiere') { goto('cantieri'); return; }
+    if (S.screen === 'nota') { NOTE_DRAFT = null; resetRecorder(); goto('cantiere'); return; }
+    if (S.screen === 'giornata') { FORM = null; S.editEntryId = null; goto('home'); return; }
+    goto('home');
+  });
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn) refreshBtn.addEventListener('click', refreshData);
 
-function renderAdminCantieri(){
-  return `
-  <h3 style="margin-top:0">Cantieri</h3>
-  <div id="sites-list">
-    ${S.sites.map((s,i)=>`
-      <div class="siterow" data-idx="${i}">
-        <span>${escapeHtml(s)}</span>
-        <button class="btn btn-danger btn-sm s-del">Elimina</button>
-      </div>
-    `).join('') || `<div class="hint">Nessun cantiere configurato.</div>`}
-  </div>
-  <h3>Aggiungi cantiere</h3>
-  <div class="siterow">
-    <input type="text" id="new-site-name" placeholder="Nome cantiere" style="border:none;padding:6px 0">
-    <button class="btn btn-primary btn-sm" id="add-site-admin-btn">Aggiungi</button>
-  </div>
-  `;
-}
-
-/* ================= EXPORT XLSX ================= */
-function exportXlsx(rows){
-  const data = rows.map(r=>({
-    'Data': fmtDate(r.date), 'Operaio': r.worker, 'Cantiere': r.cantiere, 'Ore': r.ore,
-    'Pranzo a casa': r.pranzo?'Sì':'No', 'Ore mancanti': r.missing,
-    'Lavorazioni': r.lavorazioni, 'Materiali e attrezzature': r.materiali
-  }));
-  const ws = XLSX.utils.json_to_sheet(data);
-  ws['!cols'] = [{wch:11},{wch:16},{wch:16},{wch:6},{wch:12},{wch:14},{wch:34},{wch:34}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Registro ore');
-  XLSX.writeFile(wb, 'registro-ore.xlsx');
-}
-
-/* ================= HANDLERS ================= */
-function attachHandlers(){
-  if(S.screen==='configerror'){
-    const retry = document.getElementById('retry-btn');
-    if(retry) retry.addEventListener('click', ()=>{ S.screen='loading'; render(); init(); });
-  }
-
-  if(S.screen==='login'){
-    const form = document.getElementById('login-form');
-    if(form) form.addEventListener('submit', e=>{
+  if (S.screen === 'login') {
+    document.getElementById('login-form').addEventListener('submit', e => {
       e.preventDefault();
-      const name = document.getElementById('login-name').value;
-      const pass = document.getElementById('login-pass').value;
-      const w = S.workers.find(w=>w.name===name);
-      if(w && w.password===pass){
-        S.worker = name; S.loginErr='';
-        setSession({name});
-        goto('main');
+      const p = document.getElementById('login-pass').value;
+      if (p === APP_PASSWORD) {
+        localStorage.setItem(SESSION_KEY, '1');
+        S.authed = true; S.error = '';
+        goto('home');
+        refreshData();
       } else {
-        S.loginErr = "Nome o password non corretti. Contatta l'amministratore.";
-        render();
+        S.error = 'Password non corretta.'; render();
       }
     });
-    document.getElementById('go-admin').addEventListener('click', ()=>{ S.adminErr=''; goto('adminlogin'); });
   }
 
-  if(S.screen==='main'){
-    document.getElementById('logout-btn').addEventListener('click', ()=>{
-      clearSession(); S.worker=null; S.editId=null; CURRENT_FORM=null; goto('login');
-    });
-    document.querySelectorAll('.f-ore').forEach(r=> r.addEventListener('input', recomputeTotalUI));
-    document.querySelectorAll('.site-select').forEach(wireSiteSelect);
-    document.getElementById('add-site-btn').addEventListener('click', ()=>{
-      const container = document.getElementById('sites-container');
-      const idx = document.querySelectorAll('.site-block').length;
-      container.insertAdjacentHTML('beforeend', siteBlockHtml({cantiere:S.sites[0]||'', ore:0, lavorazioni:'', materiali:''}, idx, true));
-      const newBlock = container.lastElementChild;
-      newBlock.querySelector('.f-ore').addEventListener('input', recomputeTotalUI);
-      wireSiteSelect(newBlock.querySelector('.site-select'));
-      newBlock.querySelector('.remove-block').addEventListener('click', ()=>{ newBlock.remove(); recomputeTotalUI(); });
-      recomputeTotalUI();
-    });
-    document.querySelectorAll('.remove-block').forEach(btn=> btn.addEventListener('click', function(){
-      this.closest('.site-block').remove(); recomputeTotalUI();
-    }));
+  if (S.screen === 'home') {
+    document.getElementById('go-giornata').addEventListener('click', () => { FORM = null; S.editEntryId = null; goto('giornata'); });
+    document.getElementById('go-cantieri').addEventListener('click', () => goto('cantieri'));
+    document.getElementById('go-quaderno').addEventListener('click', () => goto('quaderno'));
+  }
 
-    document.getElementById('reset-btn').addEventListener('click', ()=>{
-      S.editId = null; CURRENT_FORM = freshForm(); render();
+  if (S.screen === 'giornata') bindGiornataEvents();
+  if (S.screen === 'cantieri') bindCantieriEvents();
+  if (S.screen === 'cantiere') bindCantiereDetailEvents();
+  if (S.screen === 'nota') bindNotaEvents();
+  if (S.screen === 'quaderno') bindQuadernoEvents();
+}
+
+function bindGiornataEvents() {
+  document.querySelectorAll('.op-row').forEach(row => {
+    const worker = row.dataset.worker;
+    const check = row.querySelector('.op-check');
+    const slider = row.querySelector('.op-ore');
+    const valEl = row.querySelector('.ore-val');
+    check.addEventListener('change', () => {
+      FORM.operai[worker].presente = check.checked;
+      row.classList.toggle('off', !check.checked);
     });
-    document.getElementById('visualizza-btn').addEventListener('click', ()=>{
-      S.editId = null; CURRENT_FORM = null; goto('view');
+    slider.addEventListener('input', () => {
+      FORM.operai[worker].ore = Number(slider.value);
+      valEl.textContent = Number(slider.value) + 'h';
     });
-    const delBtn = document.getElementById('delete-entry-btn');
-    if(delBtn) delBtn.addEventListener('click', async ()=>{
-      if(window.confirm('Eliminare definitivamente questa registrazione?')){
-        S.entries = S.entries.filter(e=>e.id!==S.editId);
-        try{ await apiSave('saveEntries', S.entries); }catch(err){ alert('Errore nel salvataggio: '+err.message); }
-        S.editId = null; CURRENT_FORM = null; goto('view');
-      }
-    });
-    document.getElementById('salva-btn').addEventListener('click', async ()=>{
-      const data = collectFormFromDom();
-      if(!data.sites.length || data.sites.some(s=>!s.cantiere)){
-        alert('Seleziona un cantiere per ogni riga.'); return;
-      }
-      const total = data.sites.reduce((a,s)=>a+s.ore,0);
-      if(total < 8 && !data.missingType){
-        alert('Indica il motivo delle ore mancanti (Ferie / Malattia / Cassa meteo).'); return;
-      }
-      const entry = {
-        id: S.editId || uid(),
-        worker: S.worker,
-        date: data.date,
-        pranzoACasa: data.pranzoACasa,
-        missingType: total < 8 ? data.missingType : '',
-        sites: data.sites,
-        totalOre: total,
-        updatedAt: new Date().toISOString()
+  });
+  document.getElementById('f-new-site').addEventListener('click', async e => {
+    e.preventDefault();
+    const name = window.prompt('Nome del nuovo cantiere:');
+    if (!name || !name.trim()) return;
+    if (S.sites.includes(name.trim())) { alert('Cantiere già presente.'); return; }
+    S.sites.push(name.trim());
+    FORM.cantiere = name.trim();
+    try { await saveSitesRemote(); } catch (err) { alert('Errore salvataggio cantiere: ' + err.message); }
+    render();
+  });
+  document.getElementById('save-giornata-btn').addEventListener('click', async () => {
+    FORM.date = document.getElementById('f-date').value || todayStr();
+    FORM.cantiere = document.getElementById('f-cantiere').value;
+    FORM.lavorazioni = document.getElementById('f-lavorazioni').value;
+    FORM.materiali = document.getElementById('f-materiali').value;
+    const operaiList = Object.keys(FORM.operai).filter(w => FORM.operai[w].presente).map(w => ({ nome: w, ore: FORM.operai[w].ore }));
+    if (!FORM.cantiere) { alert('Seleziona un cantiere.'); return; }
+    if (!operaiList.length) { alert('Seleziona almeno un operaio presente.'); return; }
+
+    const entry = {
+      id: S.editEntryId || uid('e'),
+      date: FORM.date, cantiere: FORM.cantiere,
+      lavorazioni: FORM.lavorazioni, materiali: FORM.materiali,
+      operai: operaiList, updatedAt: new Date().toISOString()
+    };
+    const btn = document.getElementById('save-giornata-btn');
+    btn.disabled = true; btn.textContent = 'Salvataggio…';
+    if (S.editEntryId) {
+      const idx = S.entries.findIndex(x => x.id === S.editEntryId);
+      if (idx >= 0) S.entries[idx] = entry; else S.entries.push(entry);
+    } else {
+      S.entries.push(entry);
+    }
+    try {
+      await saveEntriesRemote();
+      FORM = null; S.editEntryId = null;
+      goto('quaderno');
+    } catch (err) {
+      alert('Errore nel salvataggio: ' + err.message);
+      btn.disabled = false; btn.textContent = 'Salva giornata';
+    }
+  });
+  const delBtn = document.getElementById('delete-giornata-btn');
+  if (delBtn) delBtn.addEventListener('click', async () => {
+    if (!window.confirm('Eliminare definitivamente questa giornata?')) return;
+    S.entries = S.entries.filter(e => e.id !== S.editEntryId);
+    try { await saveEntriesRemote(); } catch (err) { alert('Errore: ' + err.message); }
+    FORM = null; S.editEntryId = null;
+    goto('quaderno');
+  });
+}
+
+function bindCantieriEvents() {
+  document.querySelectorAll('.site-card').forEach(el => {
+    el.addEventListener('click', () => { S.selectedCantiere = el.dataset.site; goto('cantiere'); });
+  });
+  document.getElementById('add-site-tile').addEventListener('click', async () => {
+    const name = window.prompt('Nome del nuovo cantiere:');
+    if (!name || !name.trim()) return;
+    if (S.sites.includes(name.trim())) { alert('Cantiere già presente.'); return; }
+    S.sites.push(name.trim());
+    try { await saveSitesRemote(); } catch (err) { alert('Errore: ' + err.message); }
+    render();
+  });
+}
+
+function bindCantiereDetailEvents() {
+  document.getElementById('add-note-fab').addEventListener('click', () => {
+    NOTE_DRAFT = { photos: [] };
+    resetRecorder();
+    goto('nota');
+  });
+  document.querySelectorAll('.note-edit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const note = S.notes.find(n => n.id === btn.dataset.id);
+      if (!note) return;
+      NOTE_DRAFT = {
+        id: note.id,
+        date: note.date,
+        testo: note.testo,
+        photos: [],
+        removedMediaIds: [],
+        existingMedia: S.media.filter(m => m.noteId === note.id)
       };
-      if(S.editId){
-        const i = S.entries.findIndex(e=>e.id===S.editId);
-        if(i>-1) S.entries[i] = entry; else S.entries.push(entry);
-      } else {
-        S.entries.push(entry);
-      }
-      const btn = document.getElementById('salva-btn');
-      btn.disabled = true; btn.textContent = 'Salvataggio…';
-      try{
-        await apiSave('saveEntries', S.entries);
-      }catch(err){
-        alert('Errore nel salvataggio: ' + err.message);
-        btn.disabled = false; btn.textContent = S.editId ? 'Salva modifiche' : 'Salva';
-        return;
-      }
-      S.viewMonth = monthKey(entry.date);
-      S.editId = null; CURRENT_FORM = null;
-      goto('view');
+      resetRecorder();
+      goto('nota');
     });
-  }
-
-  if(S.screen==='view'){
-    document.getElementById('logout-btn').addEventListener('click', ()=>{
-      clearSession(); S.worker=null; goto('login');
-    });
-    document.getElementById('refresh-btn').addEventListener('click', async ()=>{ await refreshData(); render(); });
-    document.getElementById('month-select').addEventListener('change', function(){ S.viewMonth = this.value; render(); });
-    document.querySelectorAll('.ticket').forEach(t=> t.addEventListener('click', function(){
-      S.editId = this.dataset.id; CURRENT_FORM = null; goto('main');
-    }));
-    document.getElementById('new-entry-btn').addEventListener('click', ()=>{
-      S.editId = null; CURRENT_FORM = freshForm(); goto('main');
-    });
-    document.getElementById('exit-btn').addEventListener('click', ()=>{
-      clearSession(); S.worker=null; goto('login');
-    });
-  }
-
-  if(S.screen==='adminlogin'){
-    document.getElementById('admin-login-form').addEventListener('submit', e=>{
-      e.preventDefault();
-      const u = document.getElementById('admin-user').value;
-      const p = document.getElementById('admin-pass').value;
-      if(u===ADMIN_USER && p===ADMIN_PASS){ S.admin.loggedIn=true; S.adminErr=''; goto('admin'); }
-      else { S.adminErr='Credenziali non valide.'; render(); }
-    });
-    document.getElementById('back-to-login').addEventListener('click', ()=> goto('login'));
-  }
-
-  if(S.screen==='admin'){
-    document.getElementById('admin-logout').addEventListener('click', ()=>{ S.admin.loggedIn=false; goto('login'); });
-    document.getElementById('refresh-btn').addEventListener('click', async ()=>{ await refreshData(); render(); });
-    document.querySelectorAll('.tab-btn').forEach(b=> b.addEventListener('click', function(){ S.admin.tab=this.dataset.tab; render(); }));
-
-    if(S.admin.tab==='registro'){
-      document.getElementById('fl-worker').addEventListener('change', function(){ S.admin.filters.worker=this.value; render(); });
-      document.getElementById('fl-cantiere').addEventListener('change', function(){ S.admin.filters.cantiere=this.value; render(); });
-      document.getElementById('fl-from').addEventListener('change', function(){ S.admin.filters.from=this.value; render(); });
-      document.getElementById('fl-to').addEventListener('change', function(){ S.admin.filters.to=this.value; render(); });
-      document.getElementById('export-btn').addEventListener('click', ()=>{
-        const f = S.admin.filters;
-        let rows = flattenRows();
-        if(f.worker) rows = rows.filter(r=>r.worker===f.worker);
-        if(f.cantiere) rows = rows.filter(r=>r.cantiere===f.cantiere);
-        if(f.from) rows = rows.filter(r=>r.date>=f.from);
-        if(f.to) rows = rows.filter(r=>r.date<=f.to);
-        exportXlsx(rows);
-      });
-    }
-
-    if(S.admin.tab==='utenti'){
-      document.querySelectorAll('.userrow').forEach(row=>{
-        if(row.dataset.idx===undefined) return;
-        const idx = Number(row.dataset.idx);
-        const saveBtn = row.querySelector('.u-save');
-        const delBtn = row.querySelector('.u-del');
-        if(saveBtn) saveBtn.addEventListener('click', async ()=>{
-          const name = row.querySelector('.u-name').value.trim();
-          const pass = row.querySelector('.u-pass').value.trim();
-          if(!name || !pass){ alert('Nome e password sono obbligatori.'); return; }
-          S.workers[idx] = { name, password: pass };
-          try{ await apiSave('saveWorkers', S.workers); }catch(err){ alert('Errore: '+err.message); }
-          render();
-        });
-        if(delBtn) delBtn.addEventListener('click', async ()=>{
-          if(window.confirm('Eliminare questo operaio? Le registrazioni già salvate resteranno nel registro.')){
-            S.workers.splice(idx,1);
-            try{ await apiSave('saveWorkers', S.workers); }catch(err){ alert('Errore: '+err.message); }
-            render();
-          }
-        });
-      });
-      document.getElementById('add-user-btn').addEventListener('click', async ()=>{
-        const name = document.getElementById('new-u-name').value.trim();
-        const pass = document.getElementById('new-u-pass').value.trim();
-        if(!name || !pass){ alert('Inserisci nome e password.'); return; }
-        if(S.workers.some(w=>w.name.toLowerCase()===name.toLowerCase())){ alert('Esiste già un operaio con questo nome.'); return; }
-        S.workers.push({name, password:pass});
-        try{ await apiSave('saveWorkers', S.workers); }catch(err){ alert('Errore: '+err.message); }
+  });
+  document.querySelectorAll('.note-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!window.confirm('Eliminare questa nota e tutti i suoi allegati (foto/audio)? L\'operazione non si può annullare.')) return;
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      try {
+        await apiCall('deleteNote', { id });
+        S.notes = S.notes.filter(n => n.id !== id);
+        S.media = S.media.filter(m => m.noteId !== id);
         render();
-      });
+      } catch (err) {
+        alert('Errore nell\'eliminazione: ' + err.message);
+        render();
+      }
+    });
+  });
+}
+
+function resetRecorder() {
+  if (MEDIA_REC.stream) MEDIA_REC.stream.getTracks().forEach(t => t.stop());
+  MEDIA_REC = { recorder: null, chunks: [], stream: null, recording: false, audioBlob: null, audioUrl: null };
+}
+
+function bindNotaEvents() {
+  document.getElementById('n-testo').addEventListener('input', e => { NOTE_DRAFT.testo = e.target.value; });
+
+  document.getElementById('add-photo-btn').addEventListener('click', () => {
+    document.getElementById('photo-input').click();
+  });
+  document.getElementById('photo-input').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    NOTE_DRAFT.photos.push({ file, previewUrl });
+    e.target.value = '';
+    render();
+  });
+  document.querySelectorAll('#photo-stage .rm[data-idx]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.idx);
+      NOTE_DRAFT.photos.splice(idx, 1);
+      render();
+    });
+  });
+  document.querySelectorAll('#photo-stage .rm[data-existing-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.existingId;
+      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
+      NOTE_DRAFT.removedMediaIds.push(id);
+      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
+      render();
+    });
+  });
+  document.querySelectorAll('.existing-audio-rm').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.existingId;
+      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
+      NOTE_DRAFT.removedMediaIds.push(id);
+      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
+      render();
+    });
+  });
+
+  const startBtn = document.getElementById('start-rec-btn');
+  if (startBtn) startBtn.addEventListener('click', async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      MEDIA_REC.stream = stream;
+      const mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      MEDIA_REC.recorder = recorder;
+      MEDIA_REC.chunks = [];
+      recorder.ondataavailable = ev => { if (ev.data.size > 0) MEDIA_REC.chunks.push(ev.data); };
+      recorder.onstop = () => {
+        const blob = new Blob(MEDIA_REC.chunks, { type: mimeType });
+        MEDIA_REC.audioBlob = blob;
+        MEDIA_REC.audioUrl = URL.createObjectURL(blob);
+        MEDIA_REC.recording = false;
+        stream.getTracks().forEach(t => t.stop());
+        render();
+      };
+      recorder.start();
+      MEDIA_REC.recording = true;
+      render();
+    } catch (err) {
+      alert('Impossibile accedere al microfono: ' + err.message);
+    }
+  });
+  const stopBtn = document.getElementById('stop-rec-btn');
+  if (stopBtn) stopBtn.addEventListener('click', () => { MEDIA_REC.recorder.stop(); });
+  const discardBtn = document.getElementById('discard-audio-btn');
+  if (discardBtn) discardBtn.addEventListener('click', () => { MEDIA_REC.audioBlob = null; MEDIA_REC.audioUrl = null; render(); });
+
+  document.getElementById('save-note-btn').addEventListener('click', saveNoteAndMedia);
+}
+
+async function saveNoteAndMedia() {
+  const testo = (NOTE_DRAFT.testo || '').trim();
+  const isEdit = !!NOTE_DRAFT.id;
+  const nPhotos = NOTE_DRAFT.photos.length;
+  const hasAudio = !!MEDIA_REC.audioBlob;
+  const hasRemaining = testo || nPhotos || hasAudio || (NOTE_DRAFT.existingMedia || []).length;
+  if (!hasRemaining) {
+    alert('Aggiungi almeno un testo, una foto o una nota audio.');
+    return;
+  }
+  S.savingNote = true; S.savingLabel = 'Salvataggio nota…'; render();
+  const noteId = isEdit ? NOTE_DRAFT.id : uid('n');
+  const noteDate = isEdit ? (NOTE_DRAFT.date || todayStr()) : todayStr();
+  const note = { id: noteId, cantiere: S.selectedCantiere, date: noteDate, testo, updatedAt: new Date().toISOString() };
+  try {
+    if (isEdit) {
+      await apiCall('updateNote', note);
+      const idx = S.notes.findIndex(n => n.id === noteId);
+      if (idx >= 0) S.notes[idx] = note; else S.notes.push(note);
+
+      const toRemove = NOTE_DRAFT.removedMediaIds || [];
+      for (const mediaId of toRemove) {
+        await apiCall('deleteMedia', { id: mediaId });
+        S.media = S.media.filter(m => m.id !== mediaId);
+      }
+    } else {
+      S.notes.push(note);
+      await apiCall('appendNote', note); // aggiunge solo questa riga, non riscrive tutto il foglio
     }
 
-    if(S.admin.tab==='cantieri'){
-      document.querySelectorAll('.siterow').forEach(row=>{
-        if(row.dataset.idx===undefined) return;
-        const idx = Number(row.dataset.idx);
-        const delBtn = row.querySelector('.s-del');
-        if(delBtn) delBtn.addEventListener('click', async ()=>{
-          if(window.confirm('Eliminare questo cantiere dalla lista?')){
-            S.sites.splice(idx,1);
-            try{ await apiSave('saveSites', S.sites); }catch(err){ alert('Errore: '+err.message); }
-            render();
-          }
-        });
+    if (nPhotos || hasAudio) {
+      S.savingLabel = `Caricamento allegati (0/${nPhotos + (hasAudio ? 1 : 0)})…`; render();
+      let done = 0;
+      const bump = () => { done++; S.savingLabel = `Caricamento allegati (${done}/${nPhotos + (hasAudio ? 1 : 0)})…`; render(); };
+
+      const photoUploads = NOTE_DRAFT.photos.map(async p => {
+        const compressed = await compressImage(p.file);
+        const base64 = await blobToBase64(compressed);
+        const baseName = (p.file.name || 'foto').replace(/\.[^.]+$/, '');
+        const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'foto', baseName + '.jpg', 'image/jpeg', base64);
+        bump();
+        return res;
       });
-      document.getElementById('add-site-admin-btn').addEventListener('click', async ()=>{
-        const name = document.getElementById('new-site-name').value.trim();
-        if(!name){ return; }
-        if(S.sites.includes(name)){ alert('Cantiere già presente.'); return; }
-        S.sites.push(name);
-        try{ await apiSave('saveSites', S.sites); }catch(err){ alert('Errore: '+err.message); }
-        render();
-      });
+
+      const audioUpload = hasAudio ? (async () => {
+        const base64 = await blobToBase64(MEDIA_REC.audioBlob);
+        const mimeType = MEDIA_REC.audioBlob.type || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+        const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'audio', 'nota_audio.' + ext, mimeType, base64);
+        bump();
+        return res;
+      })() : null;
+
+      const results = await Promise.all([...photoUploads, ...(audioUpload ? [audioUpload] : [])]);
+      results.forEach(res => { if (res && res.media) S.media.push(res.media); });
     }
+
+    S.savingNote = false; S.savingLabel = '';
+    NOTE_DRAFT = null; resetRecorder();
+    goto('cantiere');
+  } catch (err) {
+    S.savingNote = false; S.savingLabel = '';
+    alert('Errore nel salvataggio: ' + err.message);
+    render();
   }
 }
 
+function bindQuadernoEvents() {
+  document.getElementById('qf-cantiere').addEventListener('change', e => { S.quadFilters.cantiere = e.target.value; render(); });
+  document.getElementById('qf-operaio').addEventListener('change', e => { S.quadFilters.operaio = e.target.value; render(); });
+  document.getElementById('qf-from').addEventListener('change', e => { S.quadFilters.from = e.target.value; render(); });
+  document.getElementById('qf-to').addEventListener('change', e => { S.quadFilters.to = e.target.value; render(); });
+  document.querySelectorAll('.ticket .main').forEach(el => {
+    el.addEventListener('click', () => { S.editEntryId = el.dataset.id; FORM = null; goto('giornata'); });
+  });
+  document.querySelectorAll('.ticket .del').forEach(el => {
+    el.addEventListener('click', async () => {
+      if (!window.confirm('Eliminare questa giornata dal quaderno?')) return;
+      S.entries = S.entries.filter(e => e.id !== el.dataset.id);
+      try { await saveEntriesRemote(); } catch (err) { alert('Errore: ' + err.message); }
+      render();
+    });
+  });
+}
+
+/* ================= INIT ================= */
+function init() {
+  if (hasSession()) {
+    S.authed = true;
+    S.screen = 'home';
+    render();
+    refreshData();
+  } else {
+    render();
+  }
+}
 init();
 </script>
 </body>
