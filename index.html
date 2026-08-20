@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -97,6 +96,21 @@
   .note-item .txt:last-child{margin-bottom:0;}
   .note-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);}
   .note-actions .btn{flex:1;}
+  .note-item.seen{background:#EAE6DA;border-color:#D9D3C2;}
+  .note-item.seen .date, .note-item.seen .txt{color:var(--steel);}
+  .file-chip{display:flex;align-items:center;gap:8px;background:#F4F1E8;border:1px solid var(--border-soft);border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:13.5px;}
+  .file-chip .fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .file-chip button{background:none;border:none;color:var(--orange-dark);font-weight:600;cursor:pointer;font-size:13px;flex-shrink:0;}
+  .file-chip .rm-file{color:var(--red);}
+  .checklist-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .checklist-item input[type=checkbox]{width:19px;height:19px;accent-color:var(--orange);flex-shrink:0;}
+  .checklist-item input[type=text]{flex:1;}
+  .checklist-item .rm-check{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;flex-shrink:0;padding:2px 6px;}
+  .checklist-view{margin-bottom:10px;}
+  .checklist-view .cl-row{display:flex;align-items:center;gap:8px;font-size:14px;padding:3px 0;}
+  .checklist-view .cl-row.done{color:var(--steel);text-decoration:line-through;}
+  .checklist-view .cl-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;}
+  .checklist-view .cl-row.done .cl-box{background:var(--green);border-color:var(--green);color:#fff;}
   .photo-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
   .photo-strip img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--border-soft);}
   .audio-item{width:100%;margin-bottom:6px;}
@@ -453,18 +467,25 @@ function screenCantieri() {
 
 function screenCantiereDetail() {
   const site = S.selectedCantiere;
-  const notes = S.notes.filter(n => n.cantiere === site).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+  const nonViste = S.notes.filter(n => n.cantiere === site && !n.vista).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+  const viste = S.notes.filter(n => n.cantiere === site && n.vista).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+  const notes = [...nonViste, ...viste];
   const items = notes.map(n => {
     const photos = S.media.filter(m => m.noteId === n.id && m.tipo === 'foto');
     const audios = S.media.filter(m => m.noteId === n.id && m.tipo === 'audio');
+    const files = S.media.filter(m => m.noteId === n.id && m.tipo === 'file');
+    const checklist = n.checklist || [];
     return `
-    <div class="note-item">
+    <div class="note-item ${n.vista ? 'seen' : ''}">
       <div class="date">${fmtDate(n.date)}</div>
       ${n.testo ? `<div class="txt">${escapeHtml(n.testo)}</div>` : ''}
       ${photos.length ? `<div class="photo-strip">${photos.map(p => `<img class="media-loading" data-media-file="${p.driveFileId}" alt="foto">`).join('')}</div>` : ''}
       ${audios.map(a => `<audio class="audio-item" controls data-media-file="${a.driveFileId}"></audio>`).join('')}
+      ${files.map(f => `<div class="file-chip"><span>&#128206;</span><span class="fname">${escapeHtml(f.nomeFile)}</span><button class="file-download" data-file-id="${f.driveFileId}" data-file-name="${escapeHtml(f.nomeFile)}">Scarica</button></div>`).join('')}
+      ${checklist.length ? `<div class="checklist-view">${checklist.map(c => `<div class="cl-row ${c.fatto ? 'done' : ''}"><span class="cl-box">${c.fatto ? '&#10003;' : ''}</span>${escapeHtml(c.testo)}</div>`).join('')}</div>` : ''}
       <div class="note-actions">
         <button class="btn btn-ghost btn-sm note-edit" data-id="${n.id}">Modifica</button>
+        <button class="btn ${n.vista ? 'btn-ghost' : 'btn-primary'} btn-sm note-vista" data-id="${n.id}" data-vista="${n.vista ? '1' : '0'}">${n.vista ? '&#8635; Da vedere' : '&#10003; Vista'}</button>
         <button class="btn btn-danger btn-sm note-del" data-id="${n.id}">Elimina</button>
       </div>
     </div>`;
@@ -482,9 +503,12 @@ function screenCantiereDetail() {
 function screenNota() {
   if (!NOTE_DRAFT) NOTE_DRAFT = { photos: [] };
   if (!NOTE_DRAFT.existingMedia) NOTE_DRAFT.existingMedia = [];
+  if (!NOTE_DRAFT.files) NOTE_DRAFT.files = [];
+  if (!NOTE_DRAFT.checklist) NOTE_DRAFT.checklist = [];
   const isEdit = !!NOTE_DRAFT.id;
   const existingPhotos = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'foto');
   const existingAudios = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'audio');
+  const existingFiles = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'file');
 
   const audioPreview = MEDIA_REC.audioUrl
     ? `<audio class="audio-item" controls src="${MEDIA_REC.audioUrl}"></audio>
@@ -512,6 +536,26 @@ function screenNota() {
       <button class="btn btn-ghost btn-sm existing-audio-rm" data-existing-id="${m.id}">Elimina questo audio</button>
     </div>`).join('');
 
+  const existingFilesHtml = existingFiles.map(m => `
+    <div class="file-chip">
+      <span>&#128206;</span><span class="fname">${escapeHtml(m.nomeFile)}</span>
+      <button class="file-download" data-file-id="${m.driveFileId}" data-file-name="${escapeHtml(m.nomeFile)}">Scarica</button>
+      <button class="rm-file" data-existing-id="${m.id}">Rimuovi</button>
+    </div>`).join('');
+
+  const newFilesHtml = NOTE_DRAFT.files.map((f, i) => `
+    <div class="file-chip">
+      <span>&#128206;</span><span class="fname">${escapeHtml(f.file.name)}</span>
+      <button class="rm-new-file" data-idx="${i}">Rimuovi</button>
+    </div>`).join('');
+
+  const checklistHtml = NOTE_DRAFT.checklist.map((c, i) => `
+    <div class="checklist-item" data-idx="${i}">
+      <input type="checkbox" class="cl-fatto" ${c.fatto ? 'checked' : ''}>
+      <input type="text" class="cl-testo" value="${escapeHtml(c.testo)}" placeholder="Voce della checklist">
+      <button class="rm-check" data-idx="${i}">&times;</button>
+    </div>`).join('');
+
   return `
   ${topbar(isEdit ? 'Modifica nota' : 'Nuova nota', S.selectedCantiere, true)}
   <div class="content">
@@ -532,6 +576,17 @@ function screenNota() {
         ${existingAudiosHtml}
         ${recControls}
         ${audioPreview}
+      </div>
+      <div class="field">
+        <label>File allegati</label>
+        <div id="file-stage">${existingFilesHtml}${newFilesHtml}</div>
+        <input type="file" id="file-input" style="display:none">
+        <button class="btn btn-ghost btn-block" id="add-file-btn">&#128206; Aggiungi file</button>
+      </div>
+      <div class="field">
+        <label>Checklist</label>
+        <div id="checklist-stage">${checklistHtml}</div>
+        <button class="btn btn-ghost btn-block" id="add-check-btn">&#65291; Aggiungi voce</button>
       </div>
     </div>
     <button class="btn btn-primary btn-block" id="save-note-btn" ${S.savingNote ? 'disabled' : ''}>${S.savingNote ? escapeHtml(S.savingLabel || 'Salvataggio…') : (isEdit ? 'Salva modifiche' : 'Salva nota')}</button>
@@ -715,7 +770,7 @@ function bindCantieriEvents() {
 
 function bindCantiereDetailEvents() {
   document.getElementById('add-note-fab').addEventListener('click', () => {
-    NOTE_DRAFT = { photos: [] };
+    NOTE_DRAFT = { photos: [], files: [], checklist: [] };
     resetRecorder();
     goto('nota');
   });
@@ -728,8 +783,10 @@ function bindCantiereDetailEvents() {
         date: note.date,
         testo: note.testo,
         photos: [],
+        files: [],
         removedMediaIds: [],
-        existingMedia: S.media.filter(m => m.noteId === note.id)
+        existingMedia: S.media.filter(m => m.noteId === note.id),
+        checklist: (note.checklist || []).map(c => ({ ...c }))
       };
       resetRecorder();
       goto('nota');
@@ -737,7 +794,7 @@ function bindCantiereDetailEvents() {
   });
   document.querySelectorAll('.note-del').forEach(btn => {
     btn.addEventListener('click', async () => {
-      if (!window.confirm('Eliminare questa nota e tutti i suoi allegati (foto/audio)? L\'operazione non si può annullare.')) return;
+      if (!window.confirm('Eliminare questa nota e tutti i suoi allegati (foto/audio/file)? L\'operazione non si può annullare.')) return;
       const id = btn.dataset.id;
       btn.disabled = true;
       try {
@@ -751,6 +808,45 @@ function bindCantiereDetailEvents() {
       }
     });
   });
+  document.querySelectorAll('.note-vista').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const newVista = btn.dataset.vista !== '1';
+      const note = S.notes.find(n => n.id === id);
+      if (note) note.vista = newVista;
+      render();
+      try {
+        await apiCall('setNoteVista', { id, vista: newVista });
+      } catch (err) {
+        if (note) note.vista = !newVista; // ripristina in caso di errore
+        alert('Errore: ' + err.message);
+        render();
+      }
+    });
+  });
+  document.querySelectorAll('.file-download').forEach(btn => {
+    btn.addEventListener('click', () => downloadFileAttachment(btn.dataset.fileId, btn.dataset.fileName, btn));
+  });
+}
+
+async function downloadFileAttachment(fileId, filename, btn) {
+  const originalText = btn.textContent;
+  btn.textContent = '…'; btn.disabled = true;
+  try {
+    const res = await apiCall('getFile', { id: fileId });
+    if (!res.base64) throw new Error('File non disponibile.');
+    const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
+    const blob = new Blob([bytes], { type: res.mimeType || 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename || 'file';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  } catch (err) {
+    alert('Errore nello scaricamento: ' + err.message);
+  } finally {
+    btn.textContent = originalText; btn.disabled = false;
+  }
 }
 
 function resetRecorder() {
@@ -798,6 +894,55 @@ function bindNotaEvents() {
     });
   });
 
+  // File allegati
+  document.getElementById('add-file-btn').addEventListener('click', () => {
+    document.getElementById('file-input').click();
+  });
+  document.getElementById('file-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    NOTE_DRAFT.files.push({ file });
+    e.target.value = '';
+    render();
+  });
+  document.querySelectorAll('.rm-new-file').forEach(btn => {
+    btn.addEventListener('click', () => {
+      NOTE_DRAFT.files.splice(Number(btn.dataset.idx), 1);
+      render();
+    });
+  });
+  document.querySelectorAll('#file-stage .rm-file').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.existingId;
+      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
+      NOTE_DRAFT.removedMediaIds.push(id);
+      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
+      render();
+    });
+  });
+  document.querySelectorAll('#file-stage .file-download').forEach(btn => {
+    btn.addEventListener('click', () => downloadFileAttachment(btn.dataset.fileId, btn.dataset.fileName, btn));
+  });
+
+  // Checklist
+  document.getElementById('add-check-btn').addEventListener('click', () => {
+    NOTE_DRAFT.checklist.push({ id: uid('c'), testo: '', fatto: false });
+    render();
+    const inputs = document.querySelectorAll('#checklist-stage .cl-testo');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  });
+  document.querySelectorAll('.checklist-item').forEach(row => {
+    const idx = Number(row.dataset.idx);
+    row.querySelector('.cl-fatto').addEventListener('change', e => { NOTE_DRAFT.checklist[idx].fatto = e.target.checked; });
+    row.querySelector('.cl-testo').addEventListener('input', e => { NOTE_DRAFT.checklist[idx].testo = e.target.value; });
+  });
+  document.querySelectorAll('.rm-check').forEach(btn => {
+    btn.addEventListener('click', () => {
+      NOTE_DRAFT.checklist.splice(Number(btn.dataset.idx), 1);
+      render();
+    });
+  });
+
   const startBtn = document.getElementById('start-rec-btn');
   if (startBtn) startBtn.addEventListener('click', async () => {
     try {
@@ -835,16 +980,24 @@ async function saveNoteAndMedia() {
   const testo = (NOTE_DRAFT.testo || '').trim();
   const isEdit = !!NOTE_DRAFT.id;
   const nPhotos = NOTE_DRAFT.photos.length;
+  const nFiles = NOTE_DRAFT.files.length;
   const hasAudio = !!MEDIA_REC.audioBlob;
-  const hasRemaining = testo || nPhotos || hasAudio || (NOTE_DRAFT.existingMedia || []).length;
+  const checklist = (NOTE_DRAFT.checklist || []).filter(c => (c.testo || '').trim());
+  const hasRemaining = testo || nPhotos || nFiles || hasAudio || checklist.length || (NOTE_DRAFT.existingMedia || []).length;
   if (!hasRemaining) {
-    alert('Aggiungi almeno un testo, una foto o una nota audio.');
+    alert('Aggiungi almeno un testo, una foto, un file, un audio o una voce di checklist.');
     return;
   }
   S.savingNote = true; S.savingLabel = 'Salvataggio nota…'; render();
   const noteId = isEdit ? NOTE_DRAFT.id : uid('n');
   const noteDate = isEdit ? (NOTE_DRAFT.date || todayStr()) : todayStr();
-  const note = { id: noteId, cantiere: S.selectedCantiere, date: noteDate, testo, updatedAt: new Date().toISOString() };
+  const existingNote = isEdit ? S.notes.find(n => n.id === noteId) : null;
+  const note = {
+    id: noteId, cantiere: S.selectedCantiere, date: noteDate, testo,
+    updatedAt: new Date().toISOString(),
+    vista: existingNote ? existingNote.vista : false,
+    checklist: checklist
+  };
   try {
     if (isEdit) {
       await apiCall('updateNote', note);
@@ -861,16 +1014,24 @@ async function saveNoteAndMedia() {
       await apiCall('appendNote', note); // aggiunge solo questa riga, non riscrive tutto il foglio
     }
 
-    if (nPhotos || hasAudio) {
-      S.savingLabel = `Caricamento allegati (0/${nPhotos + (hasAudio ? 1 : 0)})…`; render();
+    const totalUploads = nPhotos + nFiles + (hasAudio ? 1 : 0);
+    if (totalUploads) {
+      S.savingLabel = `Caricamento allegati (0/${totalUploads})…`; render();
       let done = 0;
-      const bump = () => { done++; S.savingLabel = `Caricamento allegati (${done}/${nPhotos + (hasAudio ? 1 : 0)})…`; render(); };
+      const bump = () => { done++; S.savingLabel = `Caricamento allegati (${done}/${totalUploads})…`; render(); };
 
       const photoUploads = NOTE_DRAFT.photos.map(async p => {
         const compressed = await compressImage(p.file);
         const base64 = await blobToBase64(compressed);
         const baseName = (p.file.name || 'foto').replace(/\.[^.]+$/, '');
         const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'foto', baseName + '.jpg', 'image/jpeg', base64);
+        bump();
+        return res;
+      });
+
+      const fileUploads = NOTE_DRAFT.files.map(async f => {
+        const base64 = await fileToBase64(f.file);
+        const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'file', f.file.name || 'file', f.file.type || 'application/octet-stream', base64);
         bump();
         return res;
       });
@@ -884,7 +1045,7 @@ async function saveNoteAndMedia() {
         return res;
       })() : null;
 
-      const results = await Promise.all([...photoUploads, ...(audioUpload ? [audioUpload] : [])]);
+      const results = await Promise.all([...photoUploads, ...fileUploads, ...(audioUpload ? [audioUpload] : [])]);
       results.forEach(res => { if (res && res.media) S.media.push(res.media); });
     }
 
