@@ -150,6 +150,11 @@
   @media (max-width:560px){ .fab{ left:auto; right:20px; transform:none; } }
 
   .back-link{background:none;border:none;color:var(--paper);font-family:'Inter';font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:2px;}
+
+  .loading-overlay{position:fixed;inset:0;background:rgba(31,36,33,.6);z-index:999;display:flex;align-items:center;justify-content:center;}
+  .loading-box{background:var(--paper);border-radius:14px;padding:28px 34px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 14px 34px rgba(0,0,0,.3);font-size:14px;font-weight:600;color:var(--ink);}
+  .spinner{width:36px;height:36px;border:4px solid var(--border-soft);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -157,7 +162,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -177,11 +182,17 @@ let S = {
   quadFilters: { cantiere: '', operaio: '', from: '', to: '' }
 };
 
-let FORM = null;       // stato form giornata in corso
+let FORM = null;       // stato form modifica giornata esistente (singolo record)
 let NOTE_DRAFT = null; // stato composer nota in corso
+let DAY_SESSION = null; // stato sessione "nuova giornata" a due passaggi (ore + assegnazione cantieri)
 let MEDIA_REC = { recorder: null, chunks: [], stream: null, recording: false, audioBlob: null, audioUrl: null };
 const MEDIA_CACHE = {};       // driveFileId -> object URL già scaricato/decodificato
 const MEDIA_LOADING = new Set(); // driveFileId attualmente in caricamento (evita richieste doppie)
+
+const ORE_STANDARD_KEY = 'is_ore_standard_v1';
+let ORE_STANDARD = Number(localStorage.getItem(ORE_STANDARD_KEY)) || 9;
+
+const MOTIVI_ORE_MANCANTI = ['Ferie', 'Cassa integrazione', 'Malattia', 'Altro'];
 
 /* ================= API ================= */
 async function apiCall(action, data) {
@@ -194,7 +205,7 @@ async function apiCall(action, data) {
   return json;
 }
 async function refreshData() {
-  S.loading = true; render();
+  S.loading = true; S.loadingLabel = 'Caricamento dati…'; render();
   try {
     const data = await apiCall('getAll');
     S.workers = data.workers || [];
@@ -306,12 +317,46 @@ function loadGiornataForm(entry) {
   return { date: entry.date, cantiere: entry.cantiere, lavorazioni: entry.lavorazioni, materiali: entry.materiali, operai };
 }
 
+/* ================= NUOVA GIORNATA (flusso a due passaggi) ================= */
+function freshDaySession() {
+  const operai = {};
+  S.workers.forEach(w => { operai[w] = { ore: ORE_STANDARD, touched: false, motivo: '' }; });
+  return { date: todayStr(), operai, remaining: null, cantiereForm: { cantiere: S.sites[0] || '', lavorazioni: '', materiali: '' } };
+}
+
+function promptOreStandard() {
+  const val = window.prompt('Ore standard giornaliere (usate come valore predefinito per i nuovi inserimenti):', String(ORE_STANDARD));
+  if (val === null) return;
+  const num = parseFloat(String(val).replace(',', '.'));
+  if (!isFinite(num) || num <= 0) { alert('Inserisci un numero valido maggiore di zero.'); return; }
+  ORE_STANDARD = num;
+  localStorage.setItem(ORE_STANDARD_KEY, String(num));
+  if (DAY_SESSION) {
+    S.workers.forEach(w => {
+      if (DAY_SESSION.operai[w] && !DAY_SESSION.operai[w].touched) {
+        DAY_SESSION.operai[w].ore = num;
+      }
+    });
+  }
+  render();
+}
+
 /* ================= RENDER ================= */
 function render() {
   const app = document.getElementById('app');
-  app.innerHTML = renderScreen();
+  app.innerHTML = renderScreen() + (S.loading ? loadingOverlayHtml() : '');
   bindEvents();
   hydrateMediaElements();
+}
+
+function loadingOverlayHtml() {
+  return `
+  <div class="loading-overlay">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <div>${escapeHtml(S.loadingLabel || 'Caricamento in corso…')}</div>
+    </div>
+  </div>`;
 }
 
 /* Scarica (via JSON base64) le foto/audio presenti a video ma non ancora caricati,
@@ -351,6 +396,8 @@ async function hydrateMediaElements() {
 function renderScreen() {
   if (S.screen === 'login') return screenLogin();
   if (S.screen === 'home') return screenHome();
+  if (S.screen === 'giornata-ore') return screenGiornataOre();
+  if (S.screen === 'giornata-cantiere') return screenGiornataCantiere();
   if (S.screen === 'giornata') return screenGiornata();
   if (S.screen === 'cantieri') return screenCantieri();
   if (S.screen === 'cantiere') return screenCantiereDetail();
@@ -416,6 +463,103 @@ function screenHome() {
     </button>
   </div>`;
 }
+
+function screenGiornataOre() {
+  if (!DAY_SESSION) DAY_SESSION = freshDaySession();
+  S.workers.forEach(w => { if (!DAY_SESSION.operai[w]) DAY_SESSION.operai[w] = { ore: ORE_STANDARD, touched: false, motivo: '' }; });
+
+  const rows = S.workers.map((w, i) => {
+    const st = DAY_SESSION.operai[w];
+    const showMotivo = st.ore < ORE_STANDARD;
+    return `
+    <div class="op-row on" data-worker="${escapeHtml(w)}" data-first="${i === 0 ? '1' : '0'}">
+      <div class="head">
+        <div class="name">${escapeHtml(w)}</div>
+        <div class="ore-val mono">${st.ore}h</div>
+      </div>
+      <div class="ore-slider-wrap">
+        <input type="range" class="ore-slider ds-ore" min="0" max="12" step="0.5" value="${st.ore}">
+      </div>
+      ${showMotivo ? `
+      <div class="field" style="margin-top:10px;margin-bottom:0;">
+        <label>Motivo ore mancanti (mancano ${(ORE_STANDARD - st.ore).toFixed(1).replace('.0', '')}h)</label>
+        <select class="ds-motivo">
+          <option value="">Seleziona...</option>
+          ${MOTIVI_ORE_MANCANTI.map(m => `<option value="${m}" ${st.motivo === m ? 'selected' : ''}>${m}</option>`).join('')}
+        </select>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  return `
+  ${topbar('Nuova giornata', 'Passo 1 di 2 — ore lavorate', true)}
+  <div class="content">
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    <div class="card">
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="ds-date" value="${DAY_SESSION.date}">
+      </div>
+      <div class="field">
+        <label>Ore lavorate per operaio</label>
+        ${S.workers.length ? rows : `<div class="hint">Nessun operaio configurato: aggiungili dalla pagina Admin.</div>`}
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-block" id="set-standard-btn" style="margin-bottom:12px;">&#9881;&#65039; Imposta ore standard (attuale: ${ORE_STANDARD}h)</button>
+    <button class="btn btn-primary btn-block" id="ds-avanti-btn">Avanti &rarr;</button>
+  </div>`;
+}
+
+function screenGiornataCantiere() {
+  const remaining = DAY_SESSION.remaining;
+  const activeWorkers = S.workers.filter(w => (remaining[w] || 0) > 0.001);
+  const doneWorkers = S.workers.filter(w => (remaining[w] || 0) <= 0.001 && DAY_SESSION.operai[w].ore > 0);
+  const cf = DAY_SESSION.cantiereForm;
+
+  const rows = activeWorkers.map(w => `
+    <div class="op-row on" data-worker="${escapeHtml(w)}">
+      <div class="head">
+        <div class="name">${escapeHtml(w)} <span class="hint" style="text-transform:none;">(rimangono ${remaining[w]}h)</span></div>
+        <div class="ore-val mono">${remaining[w]}h</div>
+      </div>
+      <div class="ore-slider-wrap">
+        <input type="range" class="ore-slider gc-ore" min="0" max="${remaining[w]}" step="0.5" value="${remaining[w]}">
+      </div>
+    </div>`).join('');
+
+  const doneHtml = doneWorkers.length ? `<div class="hint" style="margin-top:8px;">Ore già assegnate del tutto: ${doneWorkers.map(escapeHtml).join(', ')}</div>` : '';
+
+  return `
+  ${topbar('Nuova giornata', 'Passo 2 di 2 — assegna ai cantieri', true)}
+  <div class="content">
+    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
+    <div class="card">
+      <div class="field">
+        <label>Ore da assegnare a questo cantiere</label>
+        ${activeWorkers.length ? rows : `<div class="hint">Tutte le ore della giornata sono già state assegnate.</div>`}
+        ${doneHtml}
+      </div>
+      <div class="field">
+        <label>Cantiere</label>
+        <select id="gc-cantiere">
+          ${S.sites.map(s => `<option value="${escapeHtml(s)}" ${s === cf.cantiere ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+        </select>
+        <div class="hint">Non trovi il cantiere? <a href="#" id="gc-new-site">Aggiungine uno nuovo</a></div>
+      </div>
+      <div class="field">
+        <label>Lavorazioni effettuate</label>
+        <textarea id="gc-lavorazioni" placeholder="Es. scavo fondazioni, posa tubi...">${escapeHtml(cf.lavorazioni)}</textarea>
+      </div>
+      <div class="field">
+        <label>Materiali utilizzati</label>
+        <textarea id="gc-materiali" placeholder="Es. 20 sacchi cemento, tubi PVC...">${escapeHtml(cf.materiali)}</textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="gc-save-btn" ${activeWorkers.length ? '' : 'disabled'}>Salva assegnazione</button>
+    <button class="btn btn-ghost btn-block" id="gc-fine-btn" style="margin-top:10px;">Termina per oggi</button>
+  </div>`;
+}
+
 
 function screenGiornata() {
   if (!FORM) FORM = S.editEntryId ? loadGiornataForm(S.entries.find(e => e.id === S.editEntryId)) : freshGiornataForm();
@@ -678,6 +822,8 @@ function goBack() {
   if (S.screen === 'cantiere') { goto('cantieri'); return; }
   if (S.screen === 'nota') { NOTE_DRAFT = null; resetRecorder(); goto('cantiere'); return; }
   if (S.screen === 'giornata') { FORM = null; S.editEntryId = null; goto('home'); return; }
+  if (S.screen === 'giornata-cantiere') { goto('giornata-ore'); return; }
+  if (S.screen === 'giornata-ore') { DAY_SESSION = null; goto('home'); return; }
   goto('home');
 }
 
@@ -703,17 +849,148 @@ function bindEvents() {
   }
 
   if (S.screen === 'home') {
-    document.getElementById('go-giornata').addEventListener('click', () => { FORM = null; S.editEntryId = null; goto('giornata'); });
+    document.getElementById('go-giornata').addEventListener('click', () => { DAY_SESSION = null; goto('giornata-ore'); });
     document.getElementById('go-cantieri').addEventListener('click', () => goto('cantieri'));
     document.getElementById('go-quaderno').addEventListener('click', () => goto('quaderno'));
   }
 
+  if (S.screen === 'giornata-ore') bindGiornataOreEvents();
+  if (S.screen === 'giornata-cantiere') bindGiornataCantiereEvents();
   if (S.screen === 'giornata') bindGiornataEvents();
   if (S.screen === 'cantieri') bindCantieriEvents();
   if (S.screen === 'cantiere') bindCantiereDetailEvents();
   if (S.screen === 'nota') bindNotaEvents();
   if (S.screen === 'quaderno') bindQuadernoEvents();
 }
+
+function bindGiornataOreEvents() {
+  document.getElementById('ds-date').addEventListener('change', e => { DAY_SESSION.date = e.target.value || todayStr(); });
+
+  document.querySelectorAll('#app .op-row[data-worker]').forEach(row => {
+    const worker = row.dataset.worker;
+    const isFirst = row.dataset.first === '1';
+    const slider = row.querySelector('.ds-ore');
+    if (slider) slider.addEventListener('input', () => {
+      const val = Number(slider.value);
+      DAY_SESSION.operai[worker].ore = val;
+      DAY_SESSION.operai[worker].touched = true;
+      if (isFirst) {
+        S.workers.forEach(other => {
+          if (other !== worker && !DAY_SESSION.operai[other].touched) {
+            DAY_SESSION.operai[other].ore = val;
+          }
+        });
+      }
+      render();
+    });
+    const motivoSel = row.querySelector('.ds-motivo');
+    if (motivoSel) motivoSel.addEventListener('change', () => { DAY_SESSION.operai[worker].motivo = motivoSel.value; });
+  });
+
+  document.getElementById('set-standard-btn').addEventListener('click', promptOreStandard);
+
+  document.getElementById('ds-avanti-btn').addEventListener('click', async () => {
+    const missing = S.workers.filter(w => DAY_SESSION.operai[w].ore < ORE_STANDARD && !DAY_SESSION.operai[w].motivo);
+    if (missing.length) {
+      alert('Seleziona il motivo delle ore mancanti per: ' + missing.join(', '));
+      return;
+    }
+    if (!S.workers.length) { alert('Nessun operaio configurato.'); return; }
+
+    DAY_SESSION.remaining = {};
+    S.workers.forEach(w => { DAY_SESSION.remaining[w] = DAY_SESSION.operai[w].ore; });
+
+    const btn = document.getElementById('ds-avanti-btn');
+    btn.disabled = true; btn.textContent = 'Salvataggio…';
+    try {
+      const nowIso = new Date().toISOString();
+      const payload = S.workers.map(w => ({
+        date: DAY_SESSION.date, operaio: w,
+        oreStandard: ORE_STANDARD, oreLavorate: DAY_SESSION.operai[w].ore,
+        motivo: DAY_SESSION.operai[w].ore < ORE_STANDARD ? DAY_SESSION.operai[w].motivo : '',
+        updatedAt: nowIso
+      }));
+      await apiCall('saveOreGiorno', payload);
+      goto('giornata-cantiere');
+    } catch (err) {
+      alert('Errore nel salvataggio: ' + err.message);
+      btn.disabled = false; btn.textContent = 'Avanti →';
+    }
+  });
+}
+
+function bindGiornataCantiereEvents() {
+  document.querySelectorAll('#app .op-row[data-worker]').forEach(row => {
+    const worker = row.dataset.worker;
+    const slider = row.querySelector('.gc-ore');
+    if (slider) slider.addEventListener('input', () => {
+      row.querySelector('.ore-val').textContent = Number(slider.value) + 'h';
+    });
+  });
+
+  document.getElementById('gc-new-site').addEventListener('click', async e => {
+    e.preventDefault();
+    const name = window.prompt('Nome del nuovo cantiere:');
+    if (!name || !name.trim()) return;
+    if (S.sites.includes(name.trim())) { alert('Cantiere già presente.'); return; }
+    S.sites.push(name.trim());
+    DAY_SESSION.cantiereForm.cantiere = name.trim();
+    try { await saveSitesRemote(); } catch (err) { alert('Errore salvataggio cantiere: ' + err.message); }
+    render();
+  });
+
+  const fineBtn = document.getElementById('gc-fine-btn');
+  fineBtn.addEventListener('click', () => {
+    if (!window.confirm('Terminare la giornata? Le ore non ancora assegnate a un cantiere resteranno registrate solo nel motivo/ore standard, non in nessuna scheda cantiere.')) return;
+    DAY_SESSION = null;
+    goto('quaderno');
+  });
+
+  const saveBtn = document.getElementById('gc-save-btn');
+  if (!saveBtn) return;
+  saveBtn.addEventListener('click', async () => {
+    DAY_SESSION.cantiereForm.cantiere = document.getElementById('gc-cantiere').value;
+    DAY_SESSION.cantiereForm.lavorazioni = document.getElementById('gc-lavorazioni').value;
+    DAY_SESSION.cantiereForm.materiali = document.getElementById('gc-materiali').value;
+    if (!DAY_SESSION.cantiereForm.cantiere) { alert('Seleziona un cantiere.'); return; }
+
+    const operaiList = [];
+    document.querySelectorAll('#app .op-row[data-worker]').forEach(row => {
+      const worker = row.dataset.worker;
+      const slider = row.querySelector('.gc-ore');
+      const val = slider ? Number(slider.value) : 0;
+      if (val > 0) operaiList.push({ nome: worker, ore: val });
+    });
+    if (!operaiList.length) { alert('Assegna almeno un\'ora a un operaio.'); return; }
+
+    const entry = {
+      id: uid('e'), date: DAY_SESSION.date, cantiere: DAY_SESSION.cantiereForm.cantiere,
+      lavorazioni: DAY_SESSION.cantiereForm.lavorazioni, materiali: DAY_SESSION.cantiereForm.materiali,
+      operai: operaiList, updatedAt: new Date().toISOString()
+    };
+
+    saveBtn.disabled = true; saveBtn.textContent = 'Salvataggio…';
+    S.entries.push(entry);
+    try {
+      await saveEntriesRemote();
+      operaiList.forEach(o => { DAY_SESSION.remaining[o.nome] = Math.max(0, Math.round((DAY_SESSION.remaining[o.nome] - o.ore) * 2) / 2); });
+      DAY_SESSION.cantiereForm = { cantiere: S.sites[0] || '', lavorazioni: '', materiali: '' };
+
+      const anyRemaining = S.workers.some(w => (DAY_SESSION.remaining[w] || 0) > 0.001);
+      if (!anyRemaining) {
+        alert('Giornata completata: tutte le ore sono state assegnate.');
+        DAY_SESSION = null;
+        goto('quaderno');
+      } else {
+        render();
+      }
+    } catch (err) {
+      alert('Errore nel salvataggio: ' + err.message);
+      saveBtn.disabled = false; saveBtn.textContent = 'Salva assegnazione';
+    }
+  });
+}
+
 
 function bindGiornataEvents() {
   document.querySelectorAll('.op-row').forEach(row => {
