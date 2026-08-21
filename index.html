@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Impresa Simoni</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Simoni">
+<meta name="theme-color" content="#1F2421">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -150,7 +157,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -262,7 +269,26 @@ function uid(prefix) {
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
-function goto(screen) { S.screen = screen; S.error = ''; render(); window.scrollTo(0, 0); }
+let SUPPRESS_HISTORY_PUSH = false; // evita di ri-registrare una voce quando stiamo già rispondendo al tasto indietro
+
+function goto(screen) {
+  S.screen = screen;
+  S.error = '';
+  if (!SUPPRESS_HISTORY_PUSH) {
+    history.pushState({ screen }, '', location.href);
+  }
+  render();
+  window.scrollTo(0, 0);
+}
+
+/* Tasto/gesto "indietro" del telefono: invece di uscire dalla pagina, naviga
+   indietro dentro l'app come farebbe il pulsante "Indietro" in alto. */
+window.addEventListener('popstate', () => {
+  if (S.screen === 'home' || S.screen === 'login') return; // niente da annullare: lascia fare al browser
+  SUPPRESS_HISTORY_PUSH = true;
+  goBack();
+  SUPPRESS_HISTORY_PUSH = false;
+});
 
 function clearSession() { localStorage.removeItem(SESSION_KEY); }
 function hasSession() { return localStorage.getItem(SESSION_KEY) === '1'; }
@@ -648,14 +674,16 @@ function screenQuaderno() {
 }
 
 /* ================= EVENTI ================= */
+function goBack() {
+  if (S.screen === 'cantiere') { goto('cantieri'); return; }
+  if (S.screen === 'nota') { NOTE_DRAFT = null; resetRecorder(); goto('cantiere'); return; }
+  if (S.screen === 'giornata') { FORM = null; S.editEntryId = null; goto('home'); return; }
+  goto('home');
+}
+
 function bindEvents() {
   const backBtn = document.getElementById('back-btn');
-  if (backBtn) backBtn.addEventListener('click', () => {
-    if (S.screen === 'cantiere') { goto('cantieri'); return; }
-    if (S.screen === 'nota') { NOTE_DRAFT = null; resetRecorder(); goto('cantiere'); return; }
-    if (S.screen === 'giornata') { FORM = null; S.editEntryId = null; goto('home'); return; }
-    goto('home');
-  });
+  if (backBtn) backBtn.addEventListener('click', goBack);
   const refreshBtn = document.getElementById('refresh-btn');
   if (refreshBtn) refreshBtn.addEventListener('click', refreshData);
 
