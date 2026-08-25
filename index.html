@@ -162,7 +162,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -190,7 +190,8 @@ const MEDIA_CACHE = {};       // driveFileId -> object URL già scaricato/decodi
 const MEDIA_LOADING = new Set(); // driveFileId attualmente in caricamento (evita richieste doppie)
 
 const ORE_STANDARD_KEY = 'is_ore_standard_v1';
-let ORE_STANDARD = Number(localStorage.getItem(ORE_STANDARD_KEY)) || 9;
+let ORE_STANDARD = Number(localStorage.getItem(ORE_STANDARD_KEY)) || 9; // solo per precompilare gli slider all'apertura
+const ORE_RIFERIMENTO_MANCANTI = 8; // riferimento fisso per calcolare le ore mancanti (ferie/malattia/ecc.)
 
 const MOTIVI_ORE_MANCANTI = ['Ferie', 'Cassa integrazione', 'Malattia', 'Altro'];
 
@@ -470,7 +471,7 @@ function screenGiornataOre() {
 
   const rows = S.workers.map((w, i) => {
     const st = DAY_SESSION.operai[w];
-    const showMotivo = st.ore < ORE_STANDARD;
+    const showMotivo = st.ore < ORE_RIFERIMENTO_MANCANTI;
     return `
     <div class="op-row on" data-worker="${escapeHtml(w)}" data-first="${i === 0 ? '1' : '0'}">
       <div class="head">
@@ -482,7 +483,7 @@ function screenGiornataOre() {
       </div>
       ${showMotivo ? `
       <div class="field" style="margin-top:10px;margin-bottom:0;">
-        <label>Motivo ore mancanti (mancano ${(ORE_STANDARD - st.ore).toFixed(1).replace('.0', '')}h)</label>
+        <label>Motivo ore mancanti (mancano ${(ORE_RIFERIMENTO_MANCANTI - st.ore).toFixed(1).replace('.0', '')}h su 8h)</label>
         <select class="ds-motivo">
           <option value="">Seleziona...</option>
           ${MOTIVI_ORE_MANCANTI.map(m => `<option value="${m}" ${st.motivo === m ? 'selected' : ''}>${m}</option>`).join('')}
@@ -505,7 +506,7 @@ function screenGiornataOre() {
         ${S.workers.length ? rows : `<div class="hint">Nessun operaio configurato: aggiungili dalla pagina Admin.</div>`}
       </div>
     </div>
-    <button class="btn btn-ghost btn-block" id="set-standard-btn" style="margin-bottom:12px;">&#9881;&#65039; Imposta ore standard (attuale: ${ORE_STANDARD}h)</button>
+    <button class="btn btn-ghost btn-block" id="set-standard-btn" style="margin-bottom:12px;">&#9881;&#65039; Imposta ore iniziali predefinite (attuale: ${ORE_STANDARD}h)</button>
     <button class="btn btn-primary btn-block" id="ds-avanti-btn">Avanti &rarr;</button>
   </div>`;
 }
@@ -904,7 +905,7 @@ function bindGiornataOreEvents() {
   document.getElementById('set-standard-btn').addEventListener('click', promptOreStandard);
 
   document.getElementById('ds-avanti-btn').addEventListener('click', async () => {
-    const missing = S.workers.filter(w => DAY_SESSION.operai[w].ore < ORE_STANDARD && !DAY_SESSION.operai[w].motivo);
+    const missing = S.workers.filter(w => DAY_SESSION.operai[w].ore < ORE_RIFERIMENTO_MANCANTI && !DAY_SESSION.operai[w].motivo);
     if (missing.length) {
       alert('Seleziona il motivo delle ore mancanti per: ' + missing.join(', '));
       return;
@@ -920,8 +921,8 @@ function bindGiornataOreEvents() {
       const nowIso = new Date().toISOString();
       const payload = S.workers.map(w => ({
         date: DAY_SESSION.date, operaio: w,
-        oreStandard: ORE_STANDARD, oreLavorate: DAY_SESSION.operai[w].ore,
-        motivo: DAY_SESSION.operai[w].ore < ORE_STANDARD ? DAY_SESSION.operai[w].motivo : '',
+        oreStandard: ORE_RIFERIMENTO_MANCANTI, oreLavorate: DAY_SESSION.operai[w].ore,
+        motivo: DAY_SESSION.operai[w].ore < ORE_RIFERIMENTO_MANCANTI ? DAY_SESSION.operai[w].motivo : '',
         updatedAt: nowIso
       }));
       await apiCall('saveOreGiorno', payload);
