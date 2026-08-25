@@ -162,7 +162,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -870,19 +870,33 @@ function bindGiornataOreEvents() {
     const worker = row.dataset.worker;
     const isFirst = row.dataset.first === '1';
     const slider = row.querySelector('.ds-ore');
-    if (slider) slider.addEventListener('input', () => {
-      const val = Number(slider.value);
-      DAY_SESSION.operai[worker].ore = val;
-      DAY_SESSION.operai[worker].touched = true;
-      if (isFirst) {
-        S.workers.forEach(other => {
-          if (other !== worker && !DAY_SESSION.operai[other].touched) {
-            DAY_SESSION.operai[other].ore = val;
-          }
-        });
-      }
-      render();
-    });
+    if (slider) {
+      // Durante il trascinamento: aggiorna solo i numeri a video, senza rifare il render
+      // (rifare il render mentre lo slider è "premuto" è la causa dello scatto).
+      slider.addEventListener('input', () => {
+        const val = Number(slider.value);
+        DAY_SESSION.operai[worker].ore = val;
+        DAY_SESSION.operai[worker].touched = true;
+        const valEl = row.querySelector('.ore-val');
+        if (valEl) valEl.textContent = val + 'h';
+        if (isFirst) {
+          S.workers.forEach(other => {
+            if (other !== worker && !DAY_SESSION.operai[other].touched) {
+              DAY_SESSION.operai[other].ore = val;
+              const otherRow = document.querySelector(`.op-row[data-worker="${CSS.escape(other)}"]`);
+              if (otherRow) {
+                const otherSlider = otherRow.querySelector('.ds-ore');
+                const otherValEl = otherRow.querySelector('.ore-val');
+                if (otherSlider) otherSlider.value = val;
+                if (otherValEl) otherValEl.textContent = val + 'h';
+              }
+            }
+          });
+        }
+      });
+      // Al rilascio: ricalcola l'intera schermata (mostra/nasconde il motivo ore mancanti, ecc.)
+      slider.addEventListener('change', () => { render(); });
+    }
     const motivoSel = row.querySelector('.ds-motivo');
     if (motivoSel) motivoSel.addEventListener('change', () => { DAY_SESSION.operai[worker].motivo = motivoSel.value; });
   });
