@@ -71,18 +71,11 @@
   .home-btn:active{transform:scale(.98);}
   .home-btn .ic{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
   .home-btn.a .ic{background:#FFF0E4;}
-  .home-btn.b .ic{background:#E9F2EA;}
   .home-btn.c .ic{background:#EAEEF7;}
   .home-btn .txt h3{margin:0 0 3px;font-size:16px;}
   .home-btn .txt p{margin:0;font-size:12.5px;color:var(--steel);font-family:'Inter';text-transform:none;letter-spacing:0;}
 
   /* CANTIERI grid */
-  .site-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .site-card{background:var(--paper);border:1.5px solid var(--border-soft);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;}
-  .site-card:active{transform:scale(.97);}
-  .site-card .ic{font-size:26px;margin-bottom:8px;}
-  .site-card .name{font-family:'Oswald';font-weight:600;font-size:13.5px;text-transform:uppercase;letter-spacing:.02em;}
-  .add-site-tile{border:1.5px dashed var(--orange);color:var(--orange-dark);background:#FFF4EC;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;padding:18px 12px;cursor:pointer;}
 
   /* checklist operai */
   .op-row{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
@@ -96,44 +89,7 @@
   .op-row .ore-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--orange);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer;border:none;}
   .op-row .ore-val{font-weight:700;font-size:14px;min-width:34px;text-align:right;color:var(--orange-dark);}
 
-  /* timeline note */
-  .note-item{background:#fff;border:1px solid var(--border-soft);border-radius:10px;padding:14px;margin-bottom:12px;}
-  .note-item .date{font-family:'JetBrains Mono';font-size:11.5px;color:var(--steel);margin-bottom:6px;}
-  .note-item .txt{font-size:14.5px;line-height:1.45;white-space:pre-wrap;margin-bottom:10px;}
-  .note-item .txt:last-child{margin-bottom:0;}
-  .note-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);}
-  .note-actions .btn{flex:1;}
-  .note-item.seen{background:#EAE6DA;border-color:#D9D3C2;}
-  .note-item.seen .date, .note-item.seen .txt{color:var(--steel);}
-  .file-chip{display:flex;align-items:center;gap:8px;background:#F4F1E8;border:1px solid var(--border-soft);border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:13.5px;}
-  .file-chip .fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .file-chip button{background:none;border:none;color:var(--orange-dark);font-weight:600;cursor:pointer;font-size:13px;flex-shrink:0;}
-  .file-chip .rm-file{color:var(--red);}
-  .checklist-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-  .checklist-item input[type=checkbox]{width:19px;height:19px;accent-color:var(--orange);flex-shrink:0;}
-  .checklist-item input[type=text]{flex:1;}
-  .checklist-item .rm-check{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;flex-shrink:0;padding:2px 6px;}
-  .checklist-view{margin-bottom:10px;}
-  .checklist-view .cl-row{display:flex;align-items:center;gap:8px;font-size:14px;padding:3px 0;}
-  .checklist-view .cl-row.done{color:var(--steel);text-decoration:line-through;}
-  .checklist-view .cl-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;}
-  .checklist-view .cl-row.done .cl-box{background:var(--green);border-color:var(--green);color:#fff;}
-  .photo-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
-  .photo-strip img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--border-soft);}
-  .audio-item{width:100%;margin-bottom:6px;}
-  img.media-loading{background:var(--border-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3C/svg%3E") center/16px no-repeat;opacity:.6;}
-  .empty-state{text-align:center;padding:40px 20px;color:var(--steel);}
-  .empty-state .big{font-size:34px;margin-bottom:8px;}
 
-  /* composer nota */
-  .stage-photo{position:relative;width:84px;height:84px;border-radius:8px;overflow:hidden;border:1px solid var(--border-soft);}
-  .stage-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-  .stage-photo .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:1;cursor:pointer;}
-  .rec-row{display:flex;align-items:center;gap:10px;}
-  .rec-dot{width:11px;height:11px;border-radius:50%;background:var(--red);animation:pulse 1s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-  .attach-bar{display:flex;gap:8px;margin-bottom:14px;}
-  .attach-bar .btn{flex:1;}
 
   /* quaderno */
   .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
@@ -146,10 +102,11 @@
   .ticket .hrs{font-family:'JetBrains Mono';font-weight:700;font-size:13.5px;color:var(--orange-dark);flex-shrink:0;}
   .ticket .del{background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:4px 6px;flex-shrink:0;}
 
-  .fab{position:fixed;bottom:24px;left:50%;transform:translateX(calc(-50% + 210px));width:56px;height:56px;border-radius:50%;background:var(--orange);color:#fff;border:none;font-size:26px;box-shadow:0 6px 16px rgba(0,0,0,.25);cursor:pointer;z-index:25;}
-  @media (max-width:560px){ .fab{ left:auto; right:20px; transform:none; } }
 
   .back-link{background:none;border:none;color:var(--paper);font-family:'Inter';font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:2px;}
+
+  .empty-state{text-align:center;padding:40px 20px;color:var(--steel);}
+  .empty-state .big{font-size:34px;margin-bottom:8px;}
 
   .loading-overlay{position:fixed;inset:0;background:rgba(31,36,33,.6);z-index:999;display:flex;align-items:center;justify-content:center;}
   .loading-box{background:var(--paper);border-radius:14px;padding:28px 34px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 14px 34px rgba(0,0,0,.3);font-size:14px;font-weight:600;color:var(--ink);}
@@ -162,7 +119,7 @@
 
 <script>
 /* ================= CONFIGURAZIONE ================= */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweWXQHAzzw1wWo9p-oSY01E_qqnqc1Z7jW_Gn4RTKBq390Vw7LwAh93K-ZGwaCBD2-eg/exec';
+const APPS_SCRIPT_URL = 'INCOLLA_QUI_IL_TUO_URL_APPS_SCRIPT';
 const APP_PASSWORD = 'simoni2026'; // password unica per capocantiere/amministratore
 const SESSION_KEY = 'is_session_v1';
 
@@ -173,21 +130,14 @@ let S = {
   workers: [],
   sites: [],
   entries: [],
-  notes: [],
-  media: [],
   loading: false,
   error: '',
   editEntryId: null,
-  selectedCantiere: null,
   quadFilters: { cantiere: '', operaio: '', from: '', to: '' }
 };
 
 let FORM = null;       // stato form modifica giornata esistente (singolo record)
-let NOTE_DRAFT = null; // stato composer nota in corso
 let DAY_SESSION = null; // stato sessione "nuova giornata" a due passaggi (ore + assegnazione cantieri)
-let MEDIA_REC = { recorder: null, chunks: [], stream: null, recording: false, audioBlob: null, audioUrl: null };
-const MEDIA_CACHE = {};       // driveFileId -> object URL già scaricato/decodificato
-const MEDIA_LOADING = new Set(); // driveFileId attualmente in caricamento (evita richieste doppie)
 
 const ORE_STANDARD_KEY = 'is_ore_standard_v1';
 let ORE_STANDARD = Number(localStorage.getItem(ORE_STANDARD_KEY)) || 9; // solo per precompilare gli slider all'apertura
@@ -212,58 +162,14 @@ async function refreshData() {
     S.workers = data.workers || [];
     S.sites = data.sites || [];
     S.entries = data.entries || [];
-    S.notes = data.notes || [];
-    S.media = data.media || [];
   } catch (err) {
     S.error = 'Errore nel caricamento dati: ' + err.message;
   }
   S.loading = false; render();
 }
 async function saveEntriesRemote() { await apiCall('saveEntries', S.entries); }
-async function saveNotesRemote() { await apiCall('saveNotes', S.notes); }
 async function saveSitesRemote() { await apiCall('saveSites', S.sites); }
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result.split(',')[1]);
-    r.onerror = reject;
-    r.readAsDataURL(file);
-  });
-}
-function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result.split(',')[1]);
-    r.onerror = reject;
-    r.readAsDataURL(blob);
-  });
-}
-/* Ridimensiona e comprime una foto prima di spedirla, per velocizzare drasticamente l'upload */
-function compressImage(file, maxDim = 1600, quality = 0.72) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = e => {
-      const img = new Image();
-      img.onerror = reject;
-      img.onload = () => {
-        let { width, height } = img;
-        if (width > height && width > maxDim) { height = Math.round(height * maxDim / width); width = maxDim; }
-        else if (height > maxDim) { width = Math.round(width * maxDim / height); height = maxDim; }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Compressione immagine fallita')), 'image/jpeg', quality);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-async function uploadMediaRemote(cantiere, noteId, tipo, filename, mimeType, base64) {
-  return apiCall('uploadMedia', { cantiere, noteId, tipo, filename, mimeType, base64 });
-}
 
 /* ================= UTIL ================= */
 function todayStr() {
@@ -347,7 +253,6 @@ function render() {
   const app = document.getElementById('app');
   app.innerHTML = renderScreen() + (S.loading ? loadingOverlayHtml() : '');
   bindEvents();
-  hydrateMediaElements();
 }
 
 function loadingOverlayHtml() {
@@ -360,39 +265,6 @@ function loadingOverlayHtml() {
   </div>`;
 }
 
-/* Scarica (via JSON base64) le foto/audio presenti a video ma non ancora caricati,
-   e li applica come src una volta pronti. Usa una cache così ogni file si scarica una sola volta. */
-async function hydrateMediaElements() {
-  const els = Array.from(document.querySelectorAll('[data-media-file]'));
-  for (const el of els) {
-    const fileId = el.dataset.mediaFile;
-    if (!fileId) continue;
-    if (MEDIA_CACHE[fileId]) {
-      el.src = MEDIA_CACHE[fileId];
-      el.classList.remove('media-loading');
-      continue;
-    }
-    if (MEDIA_LOADING.has(fileId)) continue;
-    MEDIA_LOADING.add(fileId);
-    try {
-      const res = await apiCall('getFile', { id: fileId });
-      if (res.base64) {
-        const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
-        const blob = new Blob([bytes], { type: res.mimeType || 'application/octet-stream' });
-        const url = URL.createObjectURL(blob);
-        MEDIA_CACHE[fileId] = url;
-        document.querySelectorAll(`[data-media-file="${fileId}"]`).forEach(node => {
-          node.src = url;
-          node.classList.remove('media-loading');
-        });
-      }
-    } catch (err) {
-      console.error('Errore caricamento media', fileId, err);
-    } finally {
-      MEDIA_LOADING.delete(fileId);
-    }
-  }
-}
 
 function renderScreen() {
   if (S.screen === 'login') return screenLogin();
@@ -400,9 +272,6 @@ function renderScreen() {
   if (S.screen === 'giornata-ore') return screenGiornataOre();
   if (S.screen === 'giornata-cantiere') return screenGiornataCantiere();
   if (S.screen === 'giornata') return screenGiornata();
-  if (S.screen === 'cantieri') return screenCantieri();
-  if (S.screen === 'cantiere') return screenCantiereDetail();
-  if (S.screen === 'nota') return screenNota();
   if (S.screen === 'quaderno') return screenQuaderno();
   return '<div class="content">Schermata non trovata.</div>';
 }
@@ -422,9 +291,6 @@ function topbar(title, sub, showBack) {
   </div>`;
 }
 
-function screenLoadingShell() {
-  return `${topbar('Impresa Simoni', 'Caricamento dati…')}<div class="content"><div class="empty-state"><div class="big">&#9203;</div>Caricamento in corso…</div></div>`;
-}
 
 function screenLogin() {
   return `
@@ -453,10 +319,6 @@ function screenHome() {
     <button class="home-btn a" id="go-giornata">
       <div class="ic">&#128203;</div>
       <div class="txt"><h3>Inserisci giornata</h3><p>Ore lavorate, cantiere e lavorazioni di oggi</p></div>
-    </button>
-    <button class="home-btn b" id="go-cantieri">
-      <div class="ic">&#127959;&#65039;</div>
-      <div class="txt"><h3>Cantieri</h3><p>Note, foto e audio per ciascun cantiere</p></div>
     </button>
     <button class="home-btn c" id="go-quaderno">
       <div class="ic">&#128214;</div>
@@ -616,153 +478,8 @@ function screenGiornata() {
   </div>`;
 }
 
-function screenCantieri() {
-  const tiles = S.sites.map(s => `
-    <div class="site-card" data-site="${escapeHtml(s)}">
-      <div class="ic">&#127959;&#65039;</div>
-      <div class="name">${escapeHtml(s)}</div>
-    </div>`).join('');
-  return `
-  ${topbar('Cantieri', 'Seleziona un cantiere', true)}
-  <div class="content">
-    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
-    <div class="site-grid">
-      ${tiles}
-      <div class="add-site-tile" id="add-site-tile">
-        <div class="ic">&#65291;</div>
-        <div class="name">Nuovo cantiere</div>
-      </div>
-    </div>
-  </div>`;
-}
 
-function screenCantiereDetail() {
-  const site = S.selectedCantiere;
-  const nonViste = S.notes.filter(n => n.cantiere === site && !n.vista).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
-  const viste = S.notes.filter(n => n.cantiere === site && n.vista).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
-  const notes = [...nonViste, ...viste];
-  const items = notes.map(n => {
-    const photos = S.media.filter(m => m.noteId === n.id && m.tipo === 'foto');
-    const audios = S.media.filter(m => m.noteId === n.id && m.tipo === 'audio');
-    const files = S.media.filter(m => m.noteId === n.id && m.tipo === 'file');
-    const checklist = n.checklist || [];
-    return `
-    <div class="note-item ${n.vista ? 'seen' : ''}">
-      <div class="date">${fmtDate(n.date)}</div>
-      ${n.testo ? `<div class="txt">${escapeHtml(n.testo)}</div>` : ''}
-      ${photos.length ? `<div class="photo-strip">${photos.map(p => `<img class="media-loading" data-media-file="${p.driveFileId}" alt="foto">`).join('')}</div>` : ''}
-      ${audios.map(a => `<audio class="audio-item" controls data-media-file="${a.driveFileId}"></audio>`).join('')}
-      ${files.map(f => `<div class="file-chip"><span>&#128206;</span><span class="fname">${escapeHtml(f.nomeFile)}</span><button class="file-download" data-file-id="${f.driveFileId}" data-file-name="${escapeHtml(f.nomeFile)}">Scarica</button></div>`).join('')}
-      ${checklist.length ? `<div class="checklist-view">${checklist.map(c => `<div class="cl-row ${c.fatto ? 'done' : ''}"><span class="cl-box">${c.fatto ? '&#10003;' : ''}</span>${escapeHtml(c.testo)}</div>`).join('')}</div>` : ''}
-      <div class="note-actions">
-        <button class="btn btn-ghost btn-sm note-edit" data-id="${n.id}">Modifica</button>
-        <button class="btn ${n.vista ? 'btn-ghost' : 'btn-primary'} btn-sm note-vista" data-id="${n.id}" data-vista="${n.vista ? '1' : '0'}">${n.vista ? '&#8635; Da vedere' : '&#10003; Vista'}</button>
-        <button class="btn btn-danger btn-sm note-del" data-id="${n.id}">Elimina</button>
-      </div>
-    </div>`;
-  }).join('');
 
-  return `
-  ${topbar(site, 'Note, foto e audio', true)}
-  <div class="content">
-    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
-    ${notes.length ? items : `<div class="empty-state"><div class="big">&#128221;</div>Nessuna nota per questo cantiere.<br>Tocca + per aggiungerne una.</div>`}
-  </div>
-  <button class="fab" id="add-note-fab" title="Aggiungi nota">&#65291;</button>`;
-}
-
-function screenNota() {
-  if (!NOTE_DRAFT) NOTE_DRAFT = { photos: [] };
-  if (!NOTE_DRAFT.existingMedia) NOTE_DRAFT.existingMedia = [];
-  if (!NOTE_DRAFT.files) NOTE_DRAFT.files = [];
-  if (!NOTE_DRAFT.checklist) NOTE_DRAFT.checklist = [];
-  const isEdit = !!NOTE_DRAFT.id;
-  const existingPhotos = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'foto');
-  const existingAudios = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'audio');
-  const existingFiles = NOTE_DRAFT.existingMedia.filter(m => m.tipo === 'file');
-
-  const audioPreview = MEDIA_REC.audioUrl
-    ? `<audio class="audio-item" controls src="${MEDIA_REC.audioUrl}"></audio>
-       <button class="btn btn-ghost btn-sm" id="discard-audio-btn">Elimina registrazione</button>`
-    : '';
-  const recControls = MEDIA_REC.recording
-    ? `<div class="rec-row"><span class="rec-dot"></span> Registrazione in corso… <button class="btn btn-danger btn-sm" id="stop-rec-btn">Ferma</button></div>`
-    : `<button class="btn btn-ghost btn-block" id="start-rec-btn">&#127908; Registra nuova nota audio</button>`;
-
-  const existingPhotosHtml = existingPhotos.map(m => `
-    <div class="stage-photo">
-      <img class="media-loading" data-media-file="${m.driveFileId}">
-      <button class="rm" data-existing-id="${m.id}">&times;</button>
-    </div>`).join('');
-
-  const photosStage = NOTE_DRAFT.photos.map((p, i) => `
-    <div class="stage-photo">
-      <img src="${p.previewUrl}">
-      <button class="rm" data-idx="${i}">&times;</button>
-    </div>`).join('');
-
-  const existingAudiosHtml = existingAudios.map(m => `
-    <div style="margin-bottom:8px;">
-      <audio class="audio-item" controls data-media-file="${m.driveFileId}"></audio>
-      <button class="btn btn-ghost btn-sm existing-audio-rm" data-existing-id="${m.id}">Elimina questo audio</button>
-    </div>`).join('');
-
-  const existingFilesHtml = existingFiles.map(m => `
-    <div class="file-chip">
-      <span>&#128206;</span><span class="fname">${escapeHtml(m.nomeFile)}</span>
-      <button class="file-download" data-file-id="${m.driveFileId}" data-file-name="${escapeHtml(m.nomeFile)}">Scarica</button>
-      <button class="rm-file" data-existing-id="${m.id}">Rimuovi</button>
-    </div>`).join('');
-
-  const newFilesHtml = NOTE_DRAFT.files.map((f, i) => `
-    <div class="file-chip">
-      <span>&#128206;</span><span class="fname">${escapeHtml(f.file.name)}</span>
-      <button class="rm-new-file" data-idx="${i}">Rimuovi</button>
-    </div>`).join('');
-
-  const checklistHtml = NOTE_DRAFT.checklist.map((c, i) => `
-    <div class="checklist-item" data-idx="${i}">
-      <input type="checkbox" class="cl-fatto" ${c.fatto ? 'checked' : ''}>
-      <input type="text" class="cl-testo" value="${escapeHtml(c.testo)}" placeholder="Voce della checklist">
-      <button class="rm-check" data-idx="${i}">&times;</button>
-    </div>`).join('');
-
-  return `
-  ${topbar(isEdit ? 'Modifica nota' : 'Nuova nota', S.selectedCantiere, true)}
-  <div class="content">
-    ${S.error ? `<div class="err">${escapeHtml(S.error)}</div>` : ''}
-    <div class="card">
-      <div class="field">
-        <label>Nota / commento</label>
-        <textarea id="n-testo" placeholder="Scrivi qui informazioni, osservazioni, aggiornamenti...">${escapeHtml(NOTE_DRAFT.testo || '')}</textarea>
-      </div>
-      <div class="field">
-        <label>Foto</label>
-        <div class="photo-strip" id="photo-stage">${existingPhotosHtml}${photosStage}</div>
-        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
-        <button class="btn btn-ghost btn-block" id="add-photo-btn">&#128247; Aggiungi foto</button>
-      </div>
-      <div class="field">
-        <label>Nota audio</label>
-        ${existingAudiosHtml}
-        ${recControls}
-        ${audioPreview}
-      </div>
-      <div class="field">
-        <label>File allegati</label>
-        <div id="file-stage">${existingFilesHtml}${newFilesHtml}</div>
-        <input type="file" id="file-input" style="display:none">
-        <button class="btn btn-ghost btn-block" id="add-file-btn">&#128206; Aggiungi file</button>
-      </div>
-      <div class="field">
-        <label>Checklist</label>
-        <div id="checklist-stage">${checklistHtml}</div>
-        <button class="btn btn-ghost btn-block" id="add-check-btn">&#65291; Aggiungi voce</button>
-      </div>
-    </div>
-    <button class="btn btn-primary btn-block" id="save-note-btn" ${S.savingNote ? 'disabled' : ''}>${S.savingNote ? escapeHtml(S.savingLabel || 'Salvataggio…') : (isEdit ? 'Salva modifiche' : 'Salva nota')}</button>
-  </div>`;
-}
 
 function screenQuaderno() {
   const f = S.quadFilters;
@@ -820,8 +537,6 @@ function screenQuaderno() {
 
 /* ================= EVENTI ================= */
 function goBack() {
-  if (S.screen === 'cantiere') { goto('cantieri'); return; }
-  if (S.screen === 'nota') { NOTE_DRAFT = null; resetRecorder(); goto('cantiere'); return; }
   if (S.screen === 'giornata') { FORM = null; S.editEntryId = null; goto('home'); return; }
   if (S.screen === 'giornata-cantiere') { goto('giornata-ore'); return; }
   if (S.screen === 'giornata-ore') { DAY_SESSION = null; goto('home'); return; }
@@ -851,16 +566,12 @@ function bindEvents() {
 
   if (S.screen === 'home') {
     document.getElementById('go-giornata').addEventListener('click', () => { DAY_SESSION = null; goto('giornata-ore'); });
-    document.getElementById('go-cantieri').addEventListener('click', () => goto('cantieri'));
     document.getElementById('go-quaderno').addEventListener('click', () => goto('quaderno'));
   }
 
   if (S.screen === 'giornata-ore') bindGiornataOreEvents();
   if (S.screen === 'giornata-cantiere') bindGiornataCantiereEvents();
   if (S.screen === 'giornata') bindGiornataEvents();
-  if (S.screen === 'cantieri') bindCantieriEvents();
-  if (S.screen === 'cantiere') bindCantiereDetailEvents();
-  if (S.screen === 'nota') bindNotaEvents();
   if (S.screen === 'quaderno') bindQuadernoEvents();
 }
 
@@ -1074,310 +785,11 @@ function bindGiornataEvents() {
   });
 }
 
-function bindCantieriEvents() {
-  document.querySelectorAll('.site-card').forEach(el => {
-    el.addEventListener('click', () => { S.selectedCantiere = el.dataset.site; goto('cantiere'); });
-  });
-  document.getElementById('add-site-tile').addEventListener('click', async () => {
-    const name = window.prompt('Nome del nuovo cantiere:');
-    if (!name || !name.trim()) return;
-    if (S.sites.includes(name.trim())) { alert('Cantiere già presente.'); return; }
-    S.sites.push(name.trim());
-    try { await saveSitesRemote(); } catch (err) { alert('Errore: ' + err.message); }
-    render();
-  });
-}
 
-function bindCantiereDetailEvents() {
-  document.getElementById('add-note-fab').addEventListener('click', () => {
-    NOTE_DRAFT = { photos: [], files: [], checklist: [] };
-    resetRecorder();
-    goto('nota');
-  });
-  document.querySelectorAll('.note-edit').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const note = S.notes.find(n => n.id === btn.dataset.id);
-      if (!note) return;
-      NOTE_DRAFT = {
-        id: note.id,
-        date: note.date,
-        testo: note.testo,
-        photos: [],
-        files: [],
-        removedMediaIds: [],
-        existingMedia: S.media.filter(m => m.noteId === note.id),
-        checklist: (note.checklist || []).map(c => ({ ...c }))
-      };
-      resetRecorder();
-      goto('nota');
-    });
-  });
-  document.querySelectorAll('.note-del').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (!window.confirm('Eliminare questa nota e tutti i suoi allegati (foto/audio/file)? L\'operazione non si può annullare.')) return;
-      const id = btn.dataset.id;
-      btn.disabled = true;
-      try {
-        await apiCall('deleteNote', { id });
-        S.notes = S.notes.filter(n => n.id !== id);
-        S.media = S.media.filter(m => m.noteId !== id);
-        render();
-      } catch (err) {
-        alert('Errore nell\'eliminazione: ' + err.message);
-        render();
-      }
-    });
-  });
-  document.querySelectorAll('.note-vista').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
-      const newVista = btn.dataset.vista !== '1';
-      const note = S.notes.find(n => n.id === id);
-      if (note) note.vista = newVista;
-      render();
-      try {
-        await apiCall('setNoteVista', { id, vista: newVista });
-      } catch (err) {
-        if (note) note.vista = !newVista; // ripristina in caso di errore
-        alert('Errore: ' + err.message);
-        render();
-      }
-    });
-  });
-  document.querySelectorAll('.file-download').forEach(btn => {
-    btn.addEventListener('click', () => downloadFileAttachment(btn.dataset.fileId, btn.dataset.fileName, btn));
-  });
-}
 
-async function downloadFileAttachment(fileId, filename, btn) {
-  const originalText = btn.textContent;
-  btn.textContent = '…'; btn.disabled = true;
-  try {
-    const res = await apiCall('getFile', { id: fileId });
-    if (!res.base64) throw new Error('File non disponibile.');
-    const bytes = Uint8Array.from(atob(res.base64), c => c.charCodeAt(0));
-    const blob = new Blob([bytes], { type: res.mimeType || 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename || 'file';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-  } catch (err) {
-    alert('Errore nello scaricamento: ' + err.message);
-  } finally {
-    btn.textContent = originalText; btn.disabled = false;
-  }
-}
 
-function resetRecorder() {
-  if (MEDIA_REC.stream) MEDIA_REC.stream.getTracks().forEach(t => t.stop());
-  MEDIA_REC = { recorder: null, chunks: [], stream: null, recording: false, audioBlob: null, audioUrl: null };
-}
 
-function bindNotaEvents() {
-  document.getElementById('n-testo').addEventListener('input', e => { NOTE_DRAFT.testo = e.target.value; });
 
-  document.getElementById('add-photo-btn').addEventListener('click', () => {
-    document.getElementById('photo-input').click();
-  });
-  document.getElementById('photo-input').addEventListener('change', async e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const previewUrl = URL.createObjectURL(file);
-    NOTE_DRAFT.photos.push({ file, previewUrl });
-    e.target.value = '';
-    render();
-  });
-  document.querySelectorAll('#photo-stage .rm[data-idx]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = Number(btn.dataset.idx);
-      NOTE_DRAFT.photos.splice(idx, 1);
-      render();
-    });
-  });
-  document.querySelectorAll('#photo-stage .rm[data-existing-id]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.existingId;
-      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
-      NOTE_DRAFT.removedMediaIds.push(id);
-      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
-      render();
-    });
-  });
-  document.querySelectorAll('.existing-audio-rm').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.existingId;
-      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
-      NOTE_DRAFT.removedMediaIds.push(id);
-      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
-      render();
-    });
-  });
-
-  // File allegati
-  document.getElementById('add-file-btn').addEventListener('click', () => {
-    document.getElementById('file-input').click();
-  });
-  document.getElementById('file-input').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    NOTE_DRAFT.files.push({ file });
-    e.target.value = '';
-    render();
-  });
-  document.querySelectorAll('.rm-new-file').forEach(btn => {
-    btn.addEventListener('click', () => {
-      NOTE_DRAFT.files.splice(Number(btn.dataset.idx), 1);
-      render();
-    });
-  });
-  document.querySelectorAll('#file-stage .rm-file').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.existingId;
-      NOTE_DRAFT.removedMediaIds = NOTE_DRAFT.removedMediaIds || [];
-      NOTE_DRAFT.removedMediaIds.push(id);
-      NOTE_DRAFT.existingMedia = NOTE_DRAFT.existingMedia.filter(m => m.id !== id);
-      render();
-    });
-  });
-  document.querySelectorAll('#file-stage .file-download').forEach(btn => {
-    btn.addEventListener('click', () => downloadFileAttachment(btn.dataset.fileId, btn.dataset.fileName, btn));
-  });
-
-  // Checklist
-  document.getElementById('add-check-btn').addEventListener('click', () => {
-    NOTE_DRAFT.checklist.push({ id: uid('c'), testo: '', fatto: false });
-    render();
-    const inputs = document.querySelectorAll('#checklist-stage .cl-testo');
-    if (inputs.length) inputs[inputs.length - 1].focus();
-  });
-  document.querySelectorAll('.checklist-item').forEach(row => {
-    const idx = Number(row.dataset.idx);
-    row.querySelector('.cl-fatto').addEventListener('change', e => { NOTE_DRAFT.checklist[idx].fatto = e.target.checked; });
-    row.querySelector('.cl-testo').addEventListener('input', e => { NOTE_DRAFT.checklist[idx].testo = e.target.value; });
-  });
-  document.querySelectorAll('.rm-check').forEach(btn => {
-    btn.addEventListener('click', () => {
-      NOTE_DRAFT.checklist.splice(Number(btn.dataset.idx), 1);
-      render();
-    });
-  });
-
-  const startBtn = document.getElementById('start-rec-btn');
-  if (startBtn) startBtn.addEventListener('click', async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      MEDIA_REC.stream = stream;
-      const mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
-      const recorder = new MediaRecorder(stream, { mimeType });
-      MEDIA_REC.recorder = recorder;
-      MEDIA_REC.chunks = [];
-      recorder.ondataavailable = ev => { if (ev.data.size > 0) MEDIA_REC.chunks.push(ev.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(MEDIA_REC.chunks, { type: mimeType });
-        MEDIA_REC.audioBlob = blob;
-        MEDIA_REC.audioUrl = URL.createObjectURL(blob);
-        MEDIA_REC.recording = false;
-        stream.getTracks().forEach(t => t.stop());
-        render();
-      };
-      recorder.start();
-      MEDIA_REC.recording = true;
-      render();
-    } catch (err) {
-      alert('Impossibile accedere al microfono: ' + err.message);
-    }
-  });
-  const stopBtn = document.getElementById('stop-rec-btn');
-  if (stopBtn) stopBtn.addEventListener('click', () => { MEDIA_REC.recorder.stop(); });
-  const discardBtn = document.getElementById('discard-audio-btn');
-  if (discardBtn) discardBtn.addEventListener('click', () => { MEDIA_REC.audioBlob = null; MEDIA_REC.audioUrl = null; render(); });
-
-  document.getElementById('save-note-btn').addEventListener('click', saveNoteAndMedia);
-}
-
-async function saveNoteAndMedia() {
-  const testo = (NOTE_DRAFT.testo || '').trim();
-  const isEdit = !!NOTE_DRAFT.id;
-  const nPhotos = NOTE_DRAFT.photos.length;
-  const nFiles = NOTE_DRAFT.files.length;
-  const hasAudio = !!MEDIA_REC.audioBlob;
-  const checklist = (NOTE_DRAFT.checklist || []).filter(c => (c.testo || '').trim());
-  const hasRemaining = testo || nPhotos || nFiles || hasAudio || checklist.length || (NOTE_DRAFT.existingMedia || []).length;
-  if (!hasRemaining) {
-    alert('Aggiungi almeno un testo, una foto, un file, un audio o una voce di checklist.');
-    return;
-  }
-  S.savingNote = true; S.savingLabel = 'Salvataggio nota…'; render();
-  const noteId = isEdit ? NOTE_DRAFT.id : uid('n');
-  const noteDate = isEdit ? (NOTE_DRAFT.date || todayStr()) : todayStr();
-  const existingNote = isEdit ? S.notes.find(n => n.id === noteId) : null;
-  const note = {
-    id: noteId, cantiere: S.selectedCantiere, date: noteDate, testo,
-    updatedAt: new Date().toISOString(),
-    vista: existingNote ? existingNote.vista : false,
-    checklist: checklist
-  };
-  try {
-    if (isEdit) {
-      await apiCall('updateNote', note);
-      const idx = S.notes.findIndex(n => n.id === noteId);
-      if (idx >= 0) S.notes[idx] = note; else S.notes.push(note);
-
-      const toRemove = NOTE_DRAFT.removedMediaIds || [];
-      for (const mediaId of toRemove) {
-        await apiCall('deleteMedia', { id: mediaId });
-        S.media = S.media.filter(m => m.id !== mediaId);
-      }
-    } else {
-      S.notes.push(note);
-      await apiCall('appendNote', note); // aggiunge solo questa riga, non riscrive tutto il foglio
-    }
-
-    const totalUploads = nPhotos + nFiles + (hasAudio ? 1 : 0);
-    if (totalUploads) {
-      S.savingLabel = `Caricamento allegati (0/${totalUploads})…`; render();
-      let done = 0;
-      const bump = () => { done++; S.savingLabel = `Caricamento allegati (${done}/${totalUploads})…`; render(); };
-
-      const photoUploads = NOTE_DRAFT.photos.map(async p => {
-        const compressed = await compressImage(p.file);
-        const base64 = await blobToBase64(compressed);
-        const baseName = (p.file.name || 'foto').replace(/\.[^.]+$/, '');
-        const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'foto', baseName + '.jpg', 'image/jpeg', base64);
-        bump();
-        return res;
-      });
-
-      const fileUploads = NOTE_DRAFT.files.map(async f => {
-        const base64 = await fileToBase64(f.file);
-        const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'file', f.file.name || 'file', f.file.type || 'application/octet-stream', base64);
-        bump();
-        return res;
-      });
-
-      const audioUpload = hasAudio ? (async () => {
-        const base64 = await blobToBase64(MEDIA_REC.audioBlob);
-        const mimeType = MEDIA_REC.audioBlob.type || 'audio/webm';
-        const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
-        const res = await uploadMediaRemote(S.selectedCantiere, note.id, 'audio', 'nota_audio.' + ext, mimeType, base64);
-        bump();
-        return res;
-      })() : null;
-
-      const results = await Promise.all([...photoUploads, ...fileUploads, ...(audioUpload ? [audioUpload] : [])]);
-      results.forEach(res => { if (res && res.media) S.media.push(res.media); });
-    }
-
-    S.savingNote = false; S.savingLabel = '';
-    NOTE_DRAFT = null; resetRecorder();
-    goto('cantiere');
-  } catch (err) {
-    S.savingNote = false; S.savingLabel = '';
-    alert('Errore nel salvataggio: ' + err.message);
-    render();
-  }
-}
 
 function bindQuadernoEvents() {
   document.getElementById('qf-cantiere').addEventListener('change', e => { S.quadFilters.cantiere = e.target.value; render(); });
